@@ -38,7 +38,6 @@ pub mod api;
 pub mod busy;
 pub mod deserializers;
 pub mod entities;
-pub mod parsers;
 pub mod terminal;
 pub mod ws;
 

@@ -28,7 +28,9 @@ pub async fn write_env_file(
 
   let contents = environment
     .iter()
-    .map(|env| format!("{}={}", env.variable, env.value))
+    .map(|env| {
+      format!("{}={}", env.variable, encode_dotenv_value(&env.value))
+    })
     .collect::<Vec<_>>()
     .join("\n");
 
@@ -60,4 +62,50 @@ pub async fn write_env_file(
   ));
 
   Some(env_file_path)
+}
+
+fn encode_dotenv_value(value: &str) -> String {
+  if value.is_empty()
+    || value.starts_with(char::is_whitespace)
+    || value.ends_with(char::is_whitespace)
+    || value.contains(['\n', '\r', '#', '\'', '\\'])
+  {
+    format!("'{}'", value.replace('\'', "'\\''"))
+  } else {
+    value.to_string()
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  fn parse_value(encoded: &str) -> String {
+    let env = format!("KEY={encoded}\n");
+    dotenvy::from_read_iter(env.as_bytes())
+      .next()
+      .unwrap()
+      .unwrap()
+      .1
+  }
+
+  #[test]
+  fn encodes_plain_dotenv_values_without_quotes() {
+    assert_eq!(encode_dotenv_value("plain"), "plain");
+    assert_eq!(parse_value(&encode_dotenv_value("plain")), "plain");
+  }
+
+  #[test]
+  fn encodes_dotenv_values_that_need_quotes() {
+    for value in [
+      "",
+      "line 1\nline 2",
+      "it's quoted",
+      "value # comment",
+      " leading",
+      "trailing ",
+    ] {
+      assert_eq!(parse_value(&encode_dotenv_value(value)), value);
+    }
+  }
 }

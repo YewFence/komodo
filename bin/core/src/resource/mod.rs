@@ -35,7 +35,6 @@ use komodo_client::{
     update::Update,
     user::{User, system_user},
   },
-  parsers::parse_string_list,
 };
 use mogh_error::AddStatusCodeError;
 use mogh_resolver::Resolve;
@@ -466,7 +465,7 @@ pub async fn list_full_for_user_using_pattern<T: KomodoResource>(
   )
   .await?;
 
-  let patterns = parse_string_list(pattern);
+  let patterns = parse_resource_match_patterns(pattern);
   let mut names = HashSet::<String>::new();
 
   for pattern in patterns {
@@ -495,6 +494,19 @@ pub async fn list_full_for_user_using_pattern<T: KomodoResource>(
       .filter(|resource| names.contains(resource.name.as_str()))
       .collect(),
   )
+}
+
+fn parse_resource_match_patterns(source: &str) -> Vec<String> {
+  source
+    .split('\n')
+    .map(str::trim)
+    .filter(|line| !line.is_empty() && !line.starts_with('#'))
+    .filter_map(|line| line.split(" #").next())
+    .flat_map(|line| line.split(','))
+    .map(str::trim)
+    .filter(|entry| !entry.is_empty())
+    .map(str::to_string)
+    .collect()
 }
 
 /// Same as [list_full_for_user], but applies an additional in-memory

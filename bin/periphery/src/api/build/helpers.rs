@@ -5,10 +5,7 @@ use std::{
 
 use anyhow::{Context, anyhow};
 use formatting::format_serror;
-use komodo_client::{
-  entities::{EnvironmentVar, update::Log},
-  parsers::QUOTE_PATTERN,
-};
+use komodo_client::entities::{EnvironmentVar, update::Log};
 
 pub async fn write_dockerfile(
   build_path: &Path,
@@ -49,9 +46,7 @@ pub fn parse_build_args(build_args: &[EnvironmentVar]) -> String {
   build_args
     .iter()
     .map(|p| {
-      if p.value.starts_with(QUOTE_PATTERN)
-        && p.value.ends_with(QUOTE_PATTERN)
-      {
+      if is_wrapped_in_quotes(&p.value) {
         // If the value already wrapped in quotes, don't wrap it again
         format!(" --build-arg {}={}", p.variable, p.value)
       } else {
@@ -60,6 +55,11 @@ pub fn parse_build_args(build_args: &[EnvironmentVar]) -> String {
     })
     .collect::<Vec<_>>()
     .join("")
+}
+
+fn is_wrapped_in_quotes(value: &str) -> bool {
+  (value.starts_with('"') && value.ends_with('"'))
+    || (value.starts_with('\'') && value.ends_with('\''))
 }
 
 /// <https://docs.docker.com/build/building/secrets/#using-build-secrets>

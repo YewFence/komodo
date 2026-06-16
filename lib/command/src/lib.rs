@@ -1,9 +1,6 @@
 use std::{path::PathBuf, process::Stdio, sync::OnceLock};
 
-use komodo_client::{
-  entities::{komodo_timestamp, update::Log},
-  parsers::parse_multiline_command,
-};
+use komodo_client::entities::{komodo_timestamp, update::Log};
 use tokio::process::Command;
 
 mod options;
@@ -53,6 +50,27 @@ pub async fn run_komodo_multiline_command(
     return None;
   }
   Some(run_komodo_shell_command(stage, command, options).await)
+}
+
+pub fn parse_multiline_command(command: impl AsRef<str>) -> String {
+  command
+    .as_ref()
+    .split('\n')
+    .map(str::trim)
+    .filter(|line| !line.is_empty() && !line.starts_with('#'))
+    .filter_map(|line| line.split(" #").next())
+    .collect::<Vec<_>>()
+    .join("\n")
+    .split(" \\")
+    .map(str::trim)
+    .fold(String::new(), |acc, el| acc + " " + el)
+    .split('\n')
+    .map(str::trim)
+    .filter(|line| !line.is_empty() && !line.starts_with('#'))
+    .filter_map(|line| line.split(" #").next())
+    .map(str::trim)
+    .collect::<Vec<_>>()
+    .join(" && ")
 }
 
 pub enum KomodoCommandMode {

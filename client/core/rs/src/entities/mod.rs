@@ -18,7 +18,6 @@ use typeshare::typeshare;
 
 use crate::{
   deserializers::file_contents_deserializer, entities::update::Log,
-  parsers::parse_key_value_list,
 };
 
 /// Subtypes of [Action][action::Action].
@@ -411,12 +410,13 @@ pub struct EnvironmentVar {
 pub fn environment_vars_from_str(
   input: &str,
 ) -> anyhow::Result<Vec<EnvironmentVar>> {
-  parse_key_value_list(input).map(|list| {
-    list
-      .into_iter()
-      .map(|(variable, value)| EnvironmentVar { variable, value })
-      .collect()
-  })
+  dotenvy::from_read_iter(input.as_bytes())
+    .map(|res| {
+      res
+        .map(|(variable, value)| EnvironmentVar { variable, value })
+        .map_err(anyhow::Error::from)
+    })
+    .collect()
 }
 
 #[typeshare]
@@ -1735,5 +1735,59 @@ impl SwarmOrServer {
       return None;
     };
     Some(&server.name)
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn parses_dotenv_environment_values() {
+    let input = r#"
+# comment
+PLAIN=value
+INLINE=value # comment
+HASH="value # not comment"
+ESCAPED="hello\nworld"
+MULTILINE='line 1
+line 2'
+"#;
+
+    let vars = environment_vars_from_str(input).unwrap();
+
+    assert_eq!(
+      vars,
+      vec![
+        EnvironmentVar {
+          variable: "PLAIN".to_string(),
+          value: "value".to_string(),
+        },
+        EnvironmentVar {
+          variable: "INLINE".to_string(),
+          value: "value".to_string(),
+        },
+        EnvironmentVar {
+          variable: "HASH".to_string(),
+          value: "value # not comment".to_string(),
+        },
+        EnvironmentVar {
+          variable: "ESCAPED".to_string(),
+          value: "hello\nworld".to_string(),
+        },
+        EnvironmentVar {
+          variable: "MULTILINE".to_string(),
+          value: "line 1\nline 2".to_string(),
+        },
+      ]
+    );
+  }
+
+  #[test]
+  fn rejects_invalid_dotenv_environment_values() {
+    assert!(
+      environment_vars_from_str("BROKEN='unterminated").is_err()
+    );
+    assert!(environment_vars_from_str("- KEY=value").is_err());
   }
 }

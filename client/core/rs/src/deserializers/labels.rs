@@ -57,7 +57,7 @@ impl<'de> Visitor<'de> for LabelVisitor {
     let vars = vars
       .iter()
       .map(|EnvironmentVar { variable, value }| {
-        format!("  {variable}: {value}")
+        format!("{variable}={value}")
       })
       .collect::<Vec<_>>()
       .join("\n");

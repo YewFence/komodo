@@ -57,12 +57,24 @@ impl<'de> Visitor<'de> for EnvironmentVarVisitor {
     let vars = vars
       .iter()
       .map(|EnvironmentVar { variable, value }| {
-        format!("  {variable} = {value}")
+        format!("{variable}={}", dotenv_escape_value(value))
       })
       .collect::<Vec<_>>()
       .join("\n");
     let extra = if vars.is_empty() { "" } else { "\n" };
     Ok(vars + extra)
+  }
+}
+
+fn dotenv_escape_value(value: &str) -> String {
+  if value.is_empty()
+    || value.starts_with(char::is_whitespace)
+    || value.ends_with(char::is_whitespace)
+    || value.contains(['\n', '\r', '#', '\'', '\\'])
+  {
+    format!("'{}'", value.replace('\'', "'\\''"))
+  } else {
+    value.to_string()
   }
 }
 

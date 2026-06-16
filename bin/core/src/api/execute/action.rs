@@ -20,13 +20,12 @@ use komodo_client::{
     action::Action,
     alert::{Alert, AlertData, SeverityLevel},
     config::core::CoreConfig,
-    komodo_timestamp,
+    environment_vars_from_str, komodo_timestamp,
     permission::PermissionLevel,
     random_string,
     update::{Update, UpdateStatus},
     user::action_user,
   },
-  parsers::parse_key_value_list,
 };
 use mogh_auth_client::api::manage::{
   CreateApiKey, CreateApiKeyResponse,
@@ -465,10 +464,12 @@ fn parse_action_arguments(
 ) -> anyhow::Result<JsonObject> {
   match format {
     FileFormat::KeyValue => {
-      let args = parse_key_value_list(args)
-        .context("Failed to parse args as key value list")?
+      let args = environment_vars_from_str(args)
+        .context("Failed to parse args as dotenv key value list")?
         .into_iter()
-        .map(|(k, v)| (k, serde_json::Value::String(v)))
+        .map(|arg| {
+          (arg.variable, serde_json::Value::String(arg.value))
+        })
         .collect();
       Ok(args)
     }
@@ -478,6 +479,34 @@ fn parse_action_arguments(
       .context("Failed to parse Yaml to action args"),
     FileFormat::Json => serde_json::from_str(args)
       .context("Failed to parse Json to action args"),
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn parses_key_value_action_args_as_dotenv() {
+    let args = parse_action_arguments(
+      r#"
+FOO=bar
+HASH="value # literal"
+"#,
+      FileFormat::KeyValue,
+    )
+    .unwrap();
+
+    assert_eq!(args["FOO"], serde_json::json!("bar"));
+    assert_eq!(args["HASH"], serde_json::json!("value # literal"));
+  }
+
+  #[test]
+  fn rejects_yaml_list_action_args_as_key_value() {
+    assert!(
+      parse_action_arguments("- FOO=bar", FileFormat::KeyValue)
+        .is_err()
+    );
   }
 }
 

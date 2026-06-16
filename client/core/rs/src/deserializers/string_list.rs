@@ -3,8 +3,6 @@ use serde::{
   de::{SeqAccess, Visitor, value::SeqAccessDeserializer},
 };
 
-use crate::parsers::parse_string_list;
-
 pub fn string_list_deserializer<'de, D>(
   deserializer: D,
 ) -> Result<Vec<String>, D::Error>
@@ -48,6 +46,19 @@ impl<'de> Visitor<'de> for StringListVisitor {
   {
     Vec::<String>::deserialize(SeqAccessDeserializer::new(seq))
   }
+}
+
+fn parse_string_list(source: &str) -> Vec<String> {
+  source
+    .split('\n')
+    .map(str::trim)
+    .filter(|line| !line.is_empty() && !line.starts_with('#'))
+    .filter_map(|line| line.split(" #").next())
+    .flat_map(|line| line.split(','))
+    .map(str::trim)
+    .filter(|entry| !entry.is_empty())
+    .map(str::to_string)
+    .collect()
 }
 
 struct OptionStringListVisitor;

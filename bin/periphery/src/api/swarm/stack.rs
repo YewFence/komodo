@@ -2,22 +2,18 @@ use std::fmt::Write;
 
 use anyhow::{Context as _, anyhow};
 use command::{
-  CommandOptions, KomodoCommandMode,
+  KomodoCommandMode, parse_multiline_command,
   run_komodo_command_with_sanitization, run_komodo_standard_command,
 };
 use formatting::format_serror;
 use interpolate::Interpolator;
-use komodo_client::{
-  entities::{
-    all_logs_success,
-    docker::stack::SwarmStack,
-    stack::{
-      AdditionalEnvFile, ComposeFile, ComposeService,
-      StackServiceNames,
-    },
-    update::Log,
+use komodo_client::entities::{
+  all_logs_success,
+  docker::stack::SwarmStack,
+  stack::{
+    AdditionalEnvFile, ComposeFile, ComposeService, StackServiceNames,
   },
-  parsers::parse_multiline_command,
+  update::Log,
 };
 use mogh_resolver::Resolve;
 use periphery_client::api::{
@@ -92,8 +88,6 @@ impl Resolve<crate::api::Args> for RemoveSwarmStacks {
     if !self.detach {
       command += " --detach=false"
     }
-    // `--` so a stack beginning with `-` is not parsed as a flag.
-    command += " --";
     for stack in self.stacks {
       command += " ";
       command += &stack;
@@ -101,8 +95,8 @@ impl Resolve<crate::api::Args> for RemoveSwarmStacks {
     Ok(
       run_komodo_standard_command(
         "Remove Swarm Stacks",
+        None,
         command,
-        CommandOptions::default(),
       )
       .await,
     )
@@ -187,8 +181,8 @@ impl Resolve<crate::api::Args> for DeploySwarmStack {
       let span = info_span!("ExecutePreDeploy");
       if let Some(log) = run_komodo_command_with_sanitization(
         "Pre Deploy",
+        pre_deploy_path.as_path(),
         &stack.config.pre_deploy.command,
-        CommandOptions::default().path(pre_deploy_path.as_path()),
         KomodoCommandMode::Multiline,
         &replacers,
       )
@@ -253,8 +247,8 @@ impl Resolve<crate::api::Args> for DeploySwarmStack {
       let span = info_span!("GetStackConfig", command);
       let Some(config_log) = run_komodo_command_with_sanitization(
         "Stack Config",
+        run_directory.as_path(),
         command,
-        CommandOptions::default().path(run_directory.as_path()),
         mode,
         &replacers,
       )
@@ -306,8 +300,7 @@ impl Resolve<crate::api::Args> for DeploySwarmStack {
       command += " --with-registry-auth";
     }
     push_extra_args(&mut command, &stack.config.extra_args)?;
-    // `--` so a name beginning with `-` is not parsed as a flag.
-    write!(&mut command, " -- {project_name}")?;
+    write!(&mut command, " {project_name}")?;
 
     // Apply compose cmd wrapper if configured
     let (command, _) = match maybe_wrap_command(
@@ -326,8 +319,8 @@ impl Resolve<crate::api::Args> for DeploySwarmStack {
     let span = info_span!("ExecuteStackDeploy");
     let Some(log) = run_komodo_command_with_sanitization(
       "Deploy Swarm Stack",
+      run_directory.as_path(),
       command,
-      CommandOptions::default().path(run_directory.as_path()),
       KomodoCommandMode::Shell,
       &replacers,
     )
@@ -346,8 +339,8 @@ impl Resolve<crate::api::Args> for DeploySwarmStack {
       let span = info_span!("ExecutePostDeploy");
       if let Some(log) = run_komodo_command_with_sanitization(
         "Post Deploy",
+        post_deploy_path.as_path(),
         &stack.config.post_deploy.command,
-        CommandOptions::default().path(post_deploy_path.as_path()),
         KomodoCommandMode::Multiline,
         &replacers,
       )
@@ -406,8 +399,8 @@ async fn remove_stack(
 ) -> anyhow::Result<()> {
   let log = run_komodo_standard_command(
     "Remove Stack",
+    None,
     format!("docker stack rm --detach=false {stack}"),
-    CommandOptions::default(),
   )
   .await;
   let success = log.success;

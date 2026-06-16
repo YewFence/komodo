@@ -10,13 +10,10 @@ use command::{
 };
 use environment::write_env_file;
 use interpolate::Interpolator;
-use komodo_client::{
-  entities::{
-    EnvironmentVar, RepoExecutionArgs, RepoExecutionResponse,
-    SearchCombinator, SystemCommand, all_logs_success,
-    deployment::Conversion,
-  },
-  parsers::QUOTE_PATTERN,
+use komodo_client::entities::{
+  EnvironmentVar, RepoExecutionArgs, RepoExecutionResponse,
+  SearchCombinator, SystemCommand, all_logs_success,
+  deployment::Conversion,
 };
 use periphery_client::api::git::PeripheryRepoExecutionResponse;
 use shell_escape::unix::escape;
@@ -51,9 +48,7 @@ pub fn format_labels(labels: &[EnvironmentVar]) -> String {
   labels
     .iter()
     .map(|p| {
-      if p.value.starts_with(QUOTE_PATTERN)
-        && p.value.ends_with(QUOTE_PATTERN)
-      {
+      if is_wrapped_in_quotes(&p.value) {
         // If the value already wrapped in quotes, don't wrap it again
         format!(" --label {}={}", p.variable, p.value)
       } else {
@@ -69,9 +64,7 @@ pub fn push_labels(
   labels: &[EnvironmentVar],
 ) -> anyhow::Result<()> {
   for label in labels {
-    if label.value.starts_with(QUOTE_PATTERN)
-      && label.value.ends_with(QUOTE_PATTERN)
-    {
+    if is_wrapped_in_quotes(&label.value) {
       write!(command, " --label {}={}", label.variable, label.value)
     } else {
       write!(
@@ -102,9 +95,7 @@ pub fn push_environment(
   environment: &[EnvironmentVar],
 ) -> anyhow::Result<()> {
   for EnvironmentVar { variable, value } in environment {
-    if value.starts_with(QUOTE_PATTERN)
-      && value.ends_with(QUOTE_PATTERN)
-    {
+    if is_wrapped_in_quotes(value) {
       write!(command, " --env {variable}={value}")
     } else {
       write!(command, " --env {variable}=\"{value}\"")
@@ -112,6 +103,11 @@ pub fn push_environment(
     .context("Failed to format environment")?;
   }
   Ok(())
+}
+
+fn is_wrapped_in_quotes(value: &str) -> bool {
+  (value.starts_with('"') && value.ends_with('"'))
+    || (value.starts_with('\'') && value.ends_with('\''))
 }
 
 pub fn format_log_grep(
