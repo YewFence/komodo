@@ -1,8 +1,8 @@
 use std::path::PathBuf;
 
 use komodo_client::entities::{
-  EnvironmentVar, LatestCommit, RepoExecutionArgs,
-  RepoExecutionResponse, SystemCommand, update::Log,
+  LatestCommit, RepoExecutionArgs, RepoExecutionResponse,
+  SystemCommand, update::Log,
 };
 use mogh_resolver::Resolve;
 use serde::{Deserialize, Serialize};
@@ -26,7 +26,7 @@ pub struct CloneRepo {
   /// Override git token with one sent from core.
   pub git_token: Option<String>,
   #[serde(default)]
-  pub environment: Vec<EnvironmentVar>,
+  pub environment: String,
   /// Relative to repo root
   #[serde(default = "default_env_file_path")]
   pub env_file_path: String,
@@ -53,7 +53,7 @@ pub struct PullRepo {
   /// Override git token with one sent from core.
   pub git_token: Option<String>,
   #[serde(default)]
-  pub environment: Vec<EnvironmentVar>,
+  pub environment: String,
   #[serde(default = "default_env_file_path")]
   pub env_file_path: String,
   pub on_pull: Option<SystemCommand>,
@@ -75,7 +75,7 @@ pub struct PullOrCloneRepo {
   /// Override git token with one sent from core.
   pub git_token: Option<String>,
   #[serde(default)]
-  pub environment: Vec<EnvironmentVar>,
+  pub environment: String,
   #[serde(default = "default_env_file_path")]
   pub env_file_path: String,
   pub on_clone: Option<SystemCommand>,

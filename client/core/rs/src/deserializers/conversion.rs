@@ -63,7 +63,7 @@ impl<'de> Visitor<'de> for ConversionVisitor {
     let res = res
       .iter()
       .map(|Conversion { local, container }| {
-        format!("  {local}: {container}")
+        format!("{local}:{container}")
       })
       .collect::<Vec<_>>()
       .join("\n");

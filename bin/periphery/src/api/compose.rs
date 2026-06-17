@@ -5,21 +5,18 @@ use std::{
 
 use anyhow::{Context, anyhow};
 use command::{
-  CommandOptions, KomodoCommandMode,
+  CommandOptions, KomodoCommandMode, parse_multiline_command,
   run_komodo_command_with_sanitization, run_komodo_shell_command,
   run_komodo_standard_command,
 };
 use formatting::format_serror;
 use git::write_commit_file;
 use interpolate::Interpolator;
-use komodo_client::{
-  entities::{
-    FileContents, RepoExecutionResponse, all_logs_success,
-    stack::{AdditionalEnvFile, StackRemoteFileContents},
-    to_path_compatible_name,
-    update::Log,
-  },
-  parsers::parse_multiline_command,
+use komodo_client::entities::{
+  FileContents, RepoExecutionResponse, all_logs_success,
+  stack::{AdditionalEnvFile, StackRemoteFileContents},
+  to_path_compatible_name,
+  update::Log,
 };
 use mogh_resolver::Resolve;
 use periphery_client::api::{DeployStackResponse, compose::*};

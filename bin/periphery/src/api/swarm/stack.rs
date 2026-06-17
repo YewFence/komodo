@@ -2,22 +2,18 @@ use std::fmt::Write;
 
 use anyhow::{Context as _, anyhow};
 use command::{
-  CommandOptions, KomodoCommandMode,
+  CommandOptions, KomodoCommandMode, parse_multiline_command,
   run_komodo_command_with_sanitization, run_komodo_standard_command,
 };
 use formatting::format_serror;
 use interpolate::Interpolator;
-use komodo_client::{
-  entities::{
-    all_logs_success,
-    docker::stack::SwarmStack,
-    stack::{
-      AdditionalEnvFile, ComposeFile, ComposeService,
-      StackServiceNames,
-    },
-    update::Log,
+use komodo_client::entities::{
+  all_logs_success,
+  docker::stack::SwarmStack,
+  stack::{
+    AdditionalEnvFile, ComposeFile, ComposeService, StackServiceNames,
   },
-  parsers::parse_multiline_command,
+  update::Log,
 };
 use mogh_resolver::Resolve;
 use periphery_client::api::{

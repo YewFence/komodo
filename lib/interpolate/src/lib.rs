@@ -2,8 +2,8 @@ use std::collections::{HashMap, HashSet};
 
 use anyhow::Context;
 use komodo_client::entities::{
-  EnvironmentVar, build::Build, deployment::Deployment, repo::Repo,
-  stack::Stack, update::Log,
+  build::Build, deployment::Deployment, repo::Repo, stack::Stack,
+  update::Log,
 };
 
 pub struct Interpolator<'a> {
@@ -141,18 +141,6 @@ impl<'a> Interpolator<'a> {
       self
         .interpolate_string(arg)
         .context("failed interpolation into extra arg")?;
-    }
-    Ok(self)
-  }
-
-  pub fn interpolate_env_vars(
-    &mut self,
-    env_vars: &mut Vec<EnvironmentVar>,
-  ) -> anyhow::Result<&mut Self> {
-    for var in env_vars {
-      self
-        .interpolate_string(&mut var.value)
-        .context("failed interpolation into variable value")?;
     }
     Ok(self)
   }

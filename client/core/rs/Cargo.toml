@@ -59,3 +59,4 @@ bson.workspace = true
 clap.workspace = true
 envy.workspace = true
 rand.workspace = true
+dotenvy.workspace = true

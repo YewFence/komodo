@@ -142,7 +142,7 @@ impl Resolve<ExecuteArgs> for CloneRepo {
       .request(api::git::CloneRepo {
         args: (&repo).into(),
         git_token,
-        environment: repo.config.env_vars()?,
+        environment: repo.config.environment,
         env_file_path: repo.config.env_file_path,
         on_clone: repo.config.on_clone.into(),
         on_pull: repo.config.on_pull.into(),
@@ -287,7 +287,7 @@ impl Resolve<ExecuteArgs> for PullRepo {
       .request(api::git::PullRepo {
         args: (&repo).into(),
         git_token,
-        environment: repo.config.env_vars()?,
+        environment: repo.config.environment,
         env_file_path: repo.config.env_file_path,
         on_pull: repo.config.on_pull.into(),
         skip_secret_interp: repo.config.skip_secret_interp,
@@ -546,7 +546,7 @@ impl Resolve<ExecuteArgs> for BuildRepo {
         .request(api::git::CloneRepo {
           args: (&repo).into(),
           git_token,
-          environment: repo.config.env_vars()?,
+          environment: repo.config.environment,
           env_file_path: repo.config.env_file_path,
           on_clone: repo.config.on_clone.into(),
           on_pull: repo.config.on_pull.into(),

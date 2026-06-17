@@ -10,13 +10,10 @@ use command::{
 };
 use environment::write_env_file;
 use interpolate::Interpolator;
-use komodo_client::{
-  entities::{
-    EnvironmentVar, RepoExecutionArgs, RepoExecutionResponse,
-    SearchCombinator, SystemCommand, all_logs_success,
-    deployment::Conversion,
-  },
-  parsers::QUOTE_PATTERN,
+use komodo_client::entities::{
+  EnvironmentVar, RepoExecutionArgs, RepoExecutionResponse,
+  SearchCombinator, SystemCommand, all_logs_success,
+  deployment::Conversion,
 };
 use periphery_client::api::git::PeripheryRepoExecutionResponse;
 use shell_escape::unix::escape;
@@ -51,14 +48,11 @@ pub fn format_labels(labels: &[EnvironmentVar]) -> String {
   labels
     .iter()
     .map(|p| {
-      if p.value.starts_with(QUOTE_PATTERN)
-        && p.value.ends_with(QUOTE_PATTERN)
-      {
-        // If the value already wrapped in quotes, don't wrap it again
-        format!(" --label {}={}", p.variable, p.value)
-      } else {
-        format!(" --label {}=\"{}\"", p.variable, p.value)
-      }
+      format!(
+        " --label {}={}",
+        p.variable,
+        escape(p.value.as_str().into())
+      )
     })
     .collect::<Vec<_>>()
     .join("")
@@ -69,17 +63,12 @@ pub fn push_labels(
   labels: &[EnvironmentVar],
 ) -> anyhow::Result<()> {
   for label in labels {
-    if label.value.starts_with(QUOTE_PATTERN)
-      && label.value.ends_with(QUOTE_PATTERN)
-    {
-      write!(command, " --label {}={}", label.variable, label.value)
-    } else {
-      write!(
-        command,
-        " --label {}=\"{}\"",
-        label.variable, label.value
-      )
-    }
+    write!(
+      command,
+      " --label {}={}",
+      label.variable,
+      escape(label.value.as_str().into())
+    )
     .context("Failed to write labels to command")?;
   }
   Ok(())
@@ -102,13 +91,13 @@ pub fn push_environment(
   environment: &[EnvironmentVar],
 ) -> anyhow::Result<()> {
   for EnvironmentVar { variable, value } in environment {
-    if value.starts_with(QUOTE_PATTERN)
-      && value.ends_with(QUOTE_PATTERN)
-    {
-      write!(command, " --env {variable}={value}")
-    } else {
-      write!(command, " --env {variable}=\"{value}\"")
-    }
+    // Escape the value for the shell: it must reach the docker CLI
+    // byte-for-byte, with no shell interpretation in between.
+    write!(
+      command,
+      " --env {variable}={}",
+      escape(value.as_str().into())
+    )
     .context("Failed to format environment")?;
   }
   Ok(())
@@ -150,7 +139,7 @@ pub fn format_log_grep(
 )]
 pub async fn handle_post_repo_execution(
   mut res: RepoExecutionResponse,
-  mut environment: Vec<EnvironmentVar>,
+  mut environment: String,
   env_file_path: &str,
   mut on_clone: Option<SystemCommand>,
   mut on_pull: Option<SystemCommand>,
@@ -160,7 +149,7 @@ pub async fn handle_post_repo_execution(
   if !skip_secret_interp {
     let mut interpolotor =
       Interpolator::new(None, &periphery_config().secrets);
-    interpolotor.interpolate_env_vars(&mut environment)?;
+    interpolotor.interpolate_string(&mut environment)?;
     if let Some(on_clone) = on_clone.as_mut() {
       interpolotor.interpolate_string(&mut on_clone.command)?;
     }
@@ -381,5 +370,73 @@ async fn generate_self_signed_ssl_certs() {
       "🚨 Failed to generate SSL Certs | stdout: {} | stderr: {}",
       log.stdout, log.stderr
     );
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  /// Executes the given shell command with real `sh` and returns
+  /// its stdout. The commands under test run through `sh -c` in
+  /// production, so the test consumer must match.
+  fn sh_stdout(command: &str) -> String {
+    let output = std::process::Command::new("sh")
+      .args(["-c", command])
+      .output()
+      .expect("failed to spawn sh");
+    assert!(
+      output.status.success(),
+      "command failed: {command}\nstderr: {}",
+      String::from_utf8_lossy(&output.stderr)
+    );
+    String::from_utf8(output.stdout).unwrap()
+  }
+
+  /// Every env value must survive the round trip through `sh`
+  /// byte-for-byte: values reach the container exactly as the
+  /// user wrote them, with no shell interpretation in between.
+  #[test]
+  fn push_environment_values_survive_shell_round_trip() {
+    let values = [
+      "plain",
+      "p@$$w0rd!",
+      "$(id)",
+      "pre`id`post",
+      "say \"hi\"",
+      "it's",
+      "line1\nline2",
+      "a # b",
+      "trailing ",
+      " leading",
+      "*glob*",
+      "C:\\path",
+      "",
+      "semi;colon",
+      "pipe|char",
+      "BACKSLASH\\n-not-a-newline",
+    ];
+
+    let environment = values
+      .iter()
+      .enumerate()
+      .map(|(i, value)| EnvironmentVar {
+        variable: format!("VAR_{i}"),
+        value: value.to_string(),
+      })
+      .collect::<Vec<_>>();
+
+    // printf '<%s>' prints every argument wrapped in <>,
+    // so the exact argv the docker CLI would receive is observable.
+    let mut command = String::from("printf '<%s>'");
+    push_environment(&mut command, &environment).unwrap();
+
+    let stdout = sh_stdout(&command);
+
+    let mut expected = String::new();
+    for (i, value) in values.iter().enumerate() {
+      expected.push_str(&format!("<--env><VAR_{i}={value}>"));
+    }
+    assert_eq!(stdout, expected);
   }
 }

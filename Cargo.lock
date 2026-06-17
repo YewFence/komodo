@@ -2060,6 +2060,7 @@ dependencies = [
  "formatting",
  "komodo_client",
  "mogh_secret_file",
+ "tokio",
 ]
 
 [[package]]
@@ -3437,6 +3438,7 @@ dependencies = [
  "clap",
  "derive_builder",
  "derive_default_builder",
+ "dotenvy",
  "envy",
  "futures-util",
  "indexmap 2.14.0",

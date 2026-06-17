@@ -104,13 +104,9 @@ async fn write_stack_files_on_host(
     .join(&stack.config.run_directory)
     .components()
     .collect::<PathBuf>();
-  let env_file_path = environment::write_env_file(
-    &stack.config.env_vars()?,
-    run_directory.as_path(),
-    &stack.config.env_file_path,
-    res.logs(),
-  )
-  .await;
+  let env_file_path =
+    write_stack_env_file(stack, run_directory.as_path(), res.logs())
+      .await?;
   if all_logs_success(res.logs()) {
     Ok((
       run_directory,
@@ -168,7 +164,7 @@ async fn write_stack_linked_repo<'a>(
     CloneRepo {
       args,
       git_token,
-      environment: repo.config.env_vars()?,
+      environment: repo.config.environment.clone(),
       env_file_path,
       on_clone,
       on_pull,
@@ -181,7 +177,7 @@ async fn write_stack_linked_repo<'a>(
     PullOrCloneRepo {
       args,
       git_token,
-      environment: repo.config.env_vars()?,
+      environment: repo.config.environment.clone(),
       env_file_path,
       on_clone,
       on_pull,
@@ -205,13 +201,9 @@ async fn write_stack_linked_repo<'a>(
     .components()
     .collect::<PathBuf>();
 
-  let env_file_path = environment::write_env_file(
-    &stack.config.env_vars()?,
-    run_directory.as_path(),
-    &stack.config.env_file_path,
-    res.logs(),
-  )
-  .await;
+  let env_file_path =
+    write_stack_env_file(stack, run_directory.as_path(), res.logs())
+      .await?;
   if !all_logs_success(res.logs()) {
     return Err(anyhow!("Failed to write env file, stopping run"));
   }
@@ -290,13 +282,9 @@ async fn write_stack_inline_repo<'a>(
     .components()
     .collect::<PathBuf>();
 
-  let env_file_path = environment::write_env_file(
-    &stack.config.env_vars()?,
-    run_directory.as_path(),
-    &stack.config.env_file_path,
-    res.logs(),
-  )
-  .await;
+  let env_file_path =
+    write_stack_env_file(stack, run_directory.as_path(), res.logs())
+      .await?;
   if !all_logs_success(res.logs()) {
     return Err(anyhow!("Failed to write env file, stopping run"));
   }
@@ -337,13 +325,9 @@ async fn write_stack_ui_defined(
       "failed to create stack run directory at {run_directory:?}"
     )
   })?;
-  let env_file_path = environment::write_env_file(
-    &stack.config.env_vars()?,
-    run_directory.as_path(),
-    &stack.config.env_file_path,
-    res.logs(),
-  )
-  .await;
+  let env_file_path =
+    write_stack_env_file(stack, run_directory.as_path(), res.logs())
+      .await?;
   if !all_logs_success(res.logs()) {
     return Err(anyhow!("Failed to write env file, stopping run"));
   }
@@ -376,6 +360,22 @@ async fn write_stack_ui_defined(
       .is_some()
       .then_some(&stack.config.env_file_path),
   ))
+}
+
+async fn write_stack_env_file(
+  stack: &Stack,
+  run_directory: &std::path::Path,
+  logs: &mut Vec<Log>,
+) -> anyhow::Result<Option<PathBuf>> {
+  Ok(
+    environment::write_env_file(
+      &stack.config.environment,
+      run_directory,
+      &stack.config.env_file_path,
+      logs,
+    )
+    .await,
+  )
 }
 
 fn stack_git_token<R: WriteStackRes>(

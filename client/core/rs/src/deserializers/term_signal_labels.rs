@@ -56,7 +56,7 @@ impl<'de> Visitor<'de> for TermSignalLabelVisitor {
     )?
     .into_iter()
     .map(|TerminationSignalLabel { signal, label }| {
-      format!("  {signal}: {label}")
+      format!("{signal}:{label}")
     })
     .collect::<Vec<_>>()
     .join("\n");

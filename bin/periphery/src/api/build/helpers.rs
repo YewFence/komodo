@@ -5,10 +5,8 @@ use std::{
 
 use anyhow::{Context, anyhow};
 use formatting::format_serror;
-use komodo_client::{
-  entities::{EnvironmentVar, update::Log},
-  parsers::QUOTE_PATTERN,
-};
+use komodo_client::entities::{EnvironmentVar, update::Log};
+use shell_escape::unix::escape;
 
 pub async fn write_dockerfile(
   build_path: &Path,
@@ -49,14 +47,13 @@ pub fn parse_build_args(build_args: &[EnvironmentVar]) -> String {
   build_args
     .iter()
     .map(|p| {
-      if p.value.starts_with(QUOTE_PATTERN)
-        && p.value.ends_with(QUOTE_PATTERN)
-      {
-        // If the value already wrapped in quotes, don't wrap it again
-        format!(" --build-arg {}={}", p.variable, p.value)
-      } else {
-        format!(" --build-arg {}=\"{}\"", p.variable, p.value)
-      }
+      // Escape the value for the shell: it must reach the docker
+      // CLI byte-for-byte, with no shell interpretation in between.
+      format!(
+        " --build-arg {}={}",
+        p.variable,
+        escape(p.value.as_str().into())
+      )
     })
     .collect::<Vec<_>>()
     .join("")
@@ -100,4 +97,68 @@ pub async fn parse_secret_args(
     })?;
   }
   Ok(res)
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  /// Executes the given shell command with real `sh` and returns
+  /// its stdout. The commands under test run through `sh -c` in
+  /// production, so the test consumer must match.
+  fn sh_stdout(command: &str) -> String {
+    let output = std::process::Command::new("sh")
+      .args(["-c", command])
+      .output()
+      .expect("failed to spawn sh");
+    assert!(
+      output.status.success(),
+      "command failed: {command}\nstderr: {}",
+      String::from_utf8_lossy(&output.stderr)
+    );
+    String::from_utf8(output.stdout).unwrap()
+  }
+
+  /// Every build arg value must survive the round trip through
+  /// `sh` byte-for-byte: values reach the docker CLI exactly as
+  /// the user wrote them, with no shell interpretation in between.
+  #[test]
+  fn parse_build_args_values_survive_shell_round_trip() {
+    let values = [
+      "plain",
+      "p@$$w0rd!",
+      "$(id)",
+      "pre`id`post",
+      "say \"hi\"",
+      "it's",
+      "line1\nline2",
+      "a # b",
+      "trailing ",
+      "*glob*",
+      "C:\\path",
+      "",
+    ];
+
+    let build_args = values
+      .iter()
+      .enumerate()
+      .map(|(i, value)| EnvironmentVar {
+        variable: format!("ARG_{i}"),
+        value: value.to_string(),
+      })
+      .collect::<Vec<_>>();
+
+    // printf '<%s>' prints every argument wrapped in <>,
+    // so the exact argv the docker CLI would receive is observable.
+    let command =
+      format!("printf '<%s>'{}", parse_build_args(&build_args));
+
+    let stdout = sh_stdout(&command);
+
+    let mut expected = String::new();
+    for (i, value) in values.iter().enumerate() {
+      expected.push_str(&format!("<--build-arg><ARG_{i}={value}>"));
+    }
+    assert_eq!(stdout, expected);
+  }
 }

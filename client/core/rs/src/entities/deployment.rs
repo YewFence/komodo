@@ -1,4 +1,4 @@
-use anyhow::Context;
+use anyhow::{Context, bail};
 use bson::{Document, doc};
 use derive_builder::Builder;
 use derive_default_builder::DefaultBuilder;
@@ -13,7 +13,6 @@ use crate::{
     EnvironmentVar, ImageDigest, environment_vars_from_str,
     optional_str,
   },
-  parsers::parse_key_value_list,
 };
 
 use super::{
@@ -471,7 +470,7 @@ pub struct Conversion {
 pub fn conversions_from_str(
   input: &str,
 ) -> anyhow::Result<Vec<Conversion>> {
-  parse_key_value_list(input).map(|conversions| {
+  parse_colon_pair_lines(input, "conversion").map(|conversions| {
     conversions
       .into_iter()
       .map(|(local, container)| Conversion { local, container })
@@ -605,17 +604,50 @@ pub struct TerminationSignalLabel {
 pub fn term_signal_labels_from_str(
   input: &str,
 ) -> anyhow::Result<Vec<TerminationSignalLabel>> {
-  parse_key_value_list(input).and_then(|list| {
-    list
-      .into_iter()
-      .map(|(signal, label)| {
-        anyhow::Ok(TerminationSignalLabel {
-          signal: signal.parse()?,
-          label,
+  parse_colon_pair_lines(input, "termination signal label").and_then(
+    |list| {
+      list
+        .into_iter()
+        .map(|(signal, label)| {
+          anyhow::Ok(TerminationSignalLabel {
+            signal: signal.parse().with_context(|| {
+              format!("Invalid termination signal '{signal}'")
+            })?,
+            label,
+          })
         })
-      })
-      .collect()
-  })
+        .collect()
+    },
+  )
+}
+
+fn parse_colon_pair_lines(
+  input: &str,
+  description: &str,
+) -> anyhow::Result<Vec<(String, String)>> {
+  let mut pairs = Vec::new();
+  for (i, line) in input.lines().enumerate() {
+    let line = line.trim();
+    if line.is_empty() || line.starts_with('#') {
+      continue;
+    }
+    if line.starts_with('-') {
+      bail!(
+        "line {} uses unsupported yaml list syntax for {description}",
+        i + 1
+      );
+    }
+    let (left, right) = line.split_once(':').with_context(|| {
+      format!("line {} missing ':' for {description}", i + 1)
+    })?;
+    let left = left.trim();
+    let right = right.trim();
+    if left.is_empty() {
+      bail!("line {} has empty left side for {description}", i + 1);
+    }
+    pairs.push((left.to_string(), right.to_string()));
+  }
+  Ok(pairs)
 }
 
 #[typeshare]
@@ -718,5 +750,63 @@ pub fn extract_registry_domain(
     Ok(maybe_domain.to_string())
   } else {
     Ok(String::from("docker.io"))
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn parses_conversions_from_colon_lines() {
+    let conversions = conversions_from_str(
+      r#"
+# comment
+8080:80
+/host/path:/container/path
+"#,
+    )
+    .unwrap();
+
+    assert_eq!(
+      conversions,
+      vec![
+        Conversion {
+          local: "8080".to_string(),
+          container: "80".to_string(),
+        },
+        Conversion {
+          local: "/host/path".to_string(),
+          container: "/container/path".to_string(),
+        },
+      ]
+    );
+  }
+
+  #[test]
+  fn rejects_invalid_conversions() {
+    assert!(conversions_from_str("missing_separator").is_err());
+    assert!(conversions_from_str("- 8080:80").is_err());
+  }
+
+  #[test]
+  fn parses_termination_signal_labels_from_colon_lines() {
+    let labels =
+      term_signal_labels_from_str("SIGTERM:stop\nSIGINT:interrupt")
+        .unwrap();
+
+    assert_eq!(
+      labels,
+      vec![
+        TerminationSignalLabel {
+          signal: TerminationSignal::SigTerm,
+          label: "stop".to_string(),
+        },
+        TerminationSignalLabel {
+          signal: TerminationSignal::SigInt,
+          label: "interrupt".to_string(),
+        },
+      ]
+    );
   }
 }

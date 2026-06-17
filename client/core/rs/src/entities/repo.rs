@@ -1,4 +1,3 @@
-use anyhow::Context;
 use bson::{Document, doc};
 use derive_builder::Builder;
 use derive_default_builder::DefaultBuilder;
@@ -16,7 +15,7 @@ use crate::{
 };
 
 use super::{
-  EnvironmentVar, SystemCommand, environment_vars_from_str,
+  SystemCommand,
   resource::{Resource, ResourceListItem, ResourceQuery},
 };
 
@@ -234,9 +233,12 @@ pub struct RepoConfig {
   #[builder(default)]
   pub links: Vec<String>,
 
-  /// The environment variables passed to the compose file.
-  /// They will be written to path defined in env_file_path,
-  /// which is given relative to the run directory.
+  /// The environment variables written verbatim to
+  /// the file at `env_file_path` (relative to the repo root)
+  /// after clone / pull.
+  ///
+  /// The content is passed through untouched; syntax is judged
+  /// by whatever reads the file (eg. docker compose).
   ///
   /// If it is empty, no file will be written.
   #[serde(default, deserialize_with = "env_vars_deserializer")]
@@ -264,11 +266,6 @@ pub struct RepoConfig {
 impl RepoConfig {
   pub fn builder() -> RepoConfigBuilder {
     RepoConfigBuilder::default()
-  }
-
-  pub fn env_vars(&self) -> anyhow::Result<Vec<EnvironmentVar>> {
-    environment_vars_from_str(&self.environment)
-      .context("Invalid environment")
   }
 }
 
