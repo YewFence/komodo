@@ -145,6 +145,7 @@ impl Resolve<crate::api::Args> for DeploySwarmStack {
       replacers.clone(),
       &mut res,
       args,
+      crate::stack::write::StackEnvWriteMode::Dotenv,
     )
     .await
     {

@@ -12,13 +12,11 @@ use command::{
 use formatting::format_serror;
 use git::write_commit_file;
 use interpolate::Interpolator;
-use komodo_client::{
-  entities::{
-    FileContents, RepoExecutionResponse, all_logs_success,
-    stack::{AdditionalEnvFile, StackRemoteFileContents},
-    to_path_compatible_name,
-    update::Log,
-  },
+use komodo_client::entities::{
+  FileContents, RepoExecutionResponse, all_logs_success,
+  stack::{AdditionalEnvFile, StackRemoteFileContents},
+  to_path_compatible_name,
+  update::Log,
 };
 use mogh_resolver::Resolve;
 use periphery_client::api::{DeployStackResponse, compose::*};
@@ -306,6 +304,7 @@ impl Resolve<crate::api::Args> for ComposePull {
       replacers.clone(),
       &mut res,
       args,
+      crate::stack::write::StackEnvWriteMode::Raw,
     )
     .await
     {
@@ -467,6 +466,7 @@ impl Resolve<crate::api::Args> for ComposeUp {
       replacers.clone(),
       &mut res,
       args,
+      crate::stack::write::StackEnvWriteMode::Raw,
     )
     .await
     {
@@ -862,6 +862,7 @@ impl Resolve<crate::api::Args> for ComposeRun {
       replacers.clone(),
       &mut res,
       args,
+      crate::stack::write::StackEnvWriteMode::Raw,
     )
     .await
     {

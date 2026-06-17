@@ -50,6 +50,12 @@ impl WriteStackRes for &mut ComposeRunResponse {
   }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub enum StackEnvWriteMode {
+  Dotenv,
+  Raw,
+}
+
 /// Either writes the stack file_contents to a file, or clones the repo.
 /// Asssumes all interpolation is already complete.
 /// Returns (run_directory, env_file_path, periphery_replacers)
@@ -68,6 +74,7 @@ pub async fn write_stack<'a>(
   replacers: Vec<(String, String)>,
   res: impl WriteStackRes,
   req_args: &Args,
+  env_write_mode: StackEnvWriteMode,
 ) -> anyhow::Result<(
   // run_directory
   PathBuf,
@@ -75,16 +82,29 @@ pub async fn write_stack<'a>(
   Option<&'a str>,
 )> {
   if stack.config.files_on_host {
-    write_stack_files_on_host(stack, res).await
+    write_stack_files_on_host(stack, res, env_write_mode).await
   } else if let Some(repo) = repo {
     write_stack_linked_repo(
-      stack, repo, git_token, replacers, res, req_args,
+      stack,
+      repo,
+      git_token,
+      replacers,
+      res,
+      req_args,
+      env_write_mode,
     )
     .await
   } else if !stack.config.repo.is_empty() {
-    write_stack_inline_repo(stack, git_token, res, req_args).await
+    write_stack_inline_repo(
+      stack,
+      git_token,
+      res,
+      req_args,
+      env_write_mode,
+    )
+    .await
   } else {
-    write_stack_ui_defined(stack, res).await
+    write_stack_ui_defined(stack, res, env_write_mode).await
   }
 }
 
@@ -92,6 +112,7 @@ pub async fn write_stack<'a>(
 async fn write_stack_files_on_host(
   stack: &Stack,
   mut res: impl WriteStackRes,
+  env_write_mode: StackEnvWriteMode,
 ) -> anyhow::Result<(
   // run_directory
   PathBuf,
@@ -104,13 +125,13 @@ async fn write_stack_files_on_host(
     .join(&stack.config.run_directory)
     .components()
     .collect::<PathBuf>();
-  let env_file_path = environment::write_env_file(
-    &stack.config.env_vars()?,
+  let env_file_path = write_stack_env_file(
+    stack,
     run_directory.as_path(),
-    &stack.config.env_file_path,
     res.logs(),
+    env_write_mode,
   )
-  .await;
+  .await?;
   if all_logs_success(res.logs()) {
     Ok((
       run_directory,
@@ -133,6 +154,7 @@ async fn write_stack_linked_repo<'a>(
   replacers: Vec<(String, String)>,
   mut res: impl WriteStackRes,
   req_args: &Args,
+  env_write_mode: StackEnvWriteMode,
 ) -> anyhow::Result<(
   // run_directory
   PathBuf,
@@ -205,13 +227,13 @@ async fn write_stack_linked_repo<'a>(
     .components()
     .collect::<PathBuf>();
 
-  let env_file_path = environment::write_env_file(
-    &stack.config.env_vars()?,
+  let env_file_path = write_stack_env_file(
+    stack,
     run_directory.as_path(),
-    &stack.config.env_file_path,
     res.logs(),
+    env_write_mode,
   )
-  .await;
+  .await?;
   if !all_logs_success(res.logs()) {
     return Err(anyhow!("Failed to write env file, stopping run"));
   }
@@ -230,6 +252,7 @@ async fn write_stack_inline_repo<'a>(
   git_token: Option<String>,
   mut res: impl WriteStackRes,
   req_args: &Args,
+  env_write_mode: StackEnvWriteMode,
 ) -> anyhow::Result<(
   // run_directory
   PathBuf,
@@ -290,13 +313,13 @@ async fn write_stack_inline_repo<'a>(
     .components()
     .collect::<PathBuf>();
 
-  let env_file_path = environment::write_env_file(
-    &stack.config.env_vars()?,
+  let env_file_path = write_stack_env_file(
+    stack,
     run_directory.as_path(),
-    &stack.config.env_file_path,
     res.logs(),
+    env_write_mode,
   )
-  .await;
+  .await?;
   if !all_logs_success(res.logs()) {
     return Err(anyhow!("Failed to write env file, stopping run"));
   }
@@ -313,6 +336,7 @@ async fn write_stack_inline_repo<'a>(
 async fn write_stack_ui_defined(
   stack: &Stack,
   mut res: impl WriteStackRes,
+  env_write_mode: StackEnvWriteMode,
 ) -> anyhow::Result<(
   // run_directory
   PathBuf,
@@ -337,13 +361,13 @@ async fn write_stack_ui_defined(
       "failed to create stack run directory at {run_directory:?}"
     )
   })?;
-  let env_file_path = environment::write_env_file(
-    &stack.config.env_vars()?,
+  let env_file_path = write_stack_env_file(
+    stack,
     run_directory.as_path(),
-    &stack.config.env_file_path,
     res.logs(),
+    env_write_mode,
   )
-  .await;
+  .await?;
   if !all_logs_success(res.logs()) {
     return Err(anyhow!("Failed to write env file, stopping run"));
   }
@@ -376,6 +400,36 @@ async fn write_stack_ui_defined(
       .is_some()
       .then_some(&stack.config.env_file_path),
   ))
+}
+
+async fn write_stack_env_file(
+  stack: &Stack,
+  run_directory: &std::path::Path,
+  logs: &mut Vec<Log>,
+  env_write_mode: StackEnvWriteMode,
+) -> anyhow::Result<Option<PathBuf>> {
+  let env_file_path = match env_write_mode {
+    StackEnvWriteMode::Dotenv => {
+      environment::write_env_file(
+        &stack.config.env_vars()?,
+        run_directory,
+        &stack.config.env_file_path,
+        logs,
+      )
+      .await
+    }
+    StackEnvWriteMode::Raw => {
+      environment::write_raw_env_file(
+        &stack.config.environment,
+        run_directory,
+        &stack.config.env_file_path,
+        logs,
+      )
+      .await
+    }
+  };
+
+  Ok(env_file_path)
 }
 
 fn stack_git_token<R: WriteStackRes>(
