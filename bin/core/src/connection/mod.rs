@@ -38,7 +38,7 @@ use transport::{
 use uuid::Uuid;
 
 use crate::{
-  config::{core_keys, periphery_public_keys},
+  config::{core_config, core_keys, periphery_public_keys},
   state::db_client,
 };
 
@@ -344,6 +344,7 @@ impl PeripheryConnection {
       identifiers,
       private_key: core_keys().load().private.as_str(),
       public_key_validator: self.args.borrow(),
+      auth_timeout: core_config().connection_auth_timeout_duration(),
       should_close,
     })
     .await?;

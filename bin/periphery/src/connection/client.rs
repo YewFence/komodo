@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use anyhow::{Context, anyhow};
 use axum::http::{HeaderValue, StatusCode};
@@ -24,6 +24,9 @@ use crate::{
   state::{core_connections, periphery_keys},
 };
 
+const RETRY_LOG_INTERVAL: Duration = Duration::from_secs(60);
+const RETRY_LOG_EVERY: u64 = 12;
+
 #[instrument("StartCoreConnection")]
 pub async fn handler(
   address: &str,
@@ -37,9 +40,9 @@ pub async fn handler(
 
   info!("Initiating outbound connection to {endpoint}");
 
-  let mut already_logged_connection_error = false;
-  let mut already_logged_login_error = false;
-  let mut already_logged_onboarding_error = false;
+  let mut connection_errors = RetryLogState::default();
+  let mut login_errors = RetryLogState::default();
+  let mut onboarding_errors = RetryLogState::default();
 
   let core = identifiers.host().to_string();
 
@@ -48,41 +51,19 @@ pub async fn handler(
   let handle = tokio::spawn(async move {
     let mut receiver = channel.receiver()?;
     loop {
-      let (mut socket, accept) =
-        match connect_websocket(&endpoint).await {
-          Ok(res) => res,
-          Err(e) => {
-            if !already_logged_connection_error {
-              warn!("{e:#}");
-              already_logged_connection_error = true;
-              // If error transitions from login to connection,
-              // set to false to see login error after reconnect.
-              already_logged_login_error = false;
-              already_logged_onboarding_error = false;
-            }
-            tokio::time::sleep(Duration::from_secs(
-              CONNECTION_RETRY_SECONDS,
-            ))
-            .await;
-            continue;
-          }
-        };
-
-      // Receive whether to use Server connection flow vs Server onboarding flow.
-      let onboarding_flow = match socket
-        .recv_login_onboarding_flow()
+      let (mut socket, accept) = match connect_websocket(&endpoint)
         .await
-        .context("Failed to receive Login OnboardingFlow message")
       {
-        Ok(onboarding_flow) => onboarding_flow,
+        Ok(res) => res,
         Err(e) => {
-          if !already_logged_connection_error {
-            warn!("{e:#}");
-            already_logged_connection_error = true;
+          if let Some(retry_count) =
+            connection_errors.record_failure(Instant::now())
+          {
+            warn!(phase = "websocket connect", retry_count, "{e:#}");
             // If error transitions from login to connection,
-            // set to false to see login error after reconnect.
-            already_logged_login_error = false;
-            already_logged_onboarding_error = false;
+            // reset these to see the next login / onboarding error.
+            login_errors.reset();
+            onboarding_errors.reset();
           }
           tokio::time::sleep(Duration::from_secs(
             CONNECTION_RETRY_SECONDS,
@@ -92,7 +73,37 @@ pub async fn handler(
         }
       };
 
-      already_logged_connection_error = false;
+      // Receive whether to use Server connection flow vs Server onboarding flow.
+      let onboarding_flow = match socket
+        .recv_login_onboarding_flow_with_timeout(
+          periphery_config().connection_auth_timeout_duration(),
+        )
+        .await
+        .context("Failed to receive Login OnboardingFlow message")
+      {
+        Ok(onboarding_flow) => onboarding_flow,
+        Err(e) => {
+          if let Some(retry_count) =
+            connection_errors.record_failure(Instant::now())
+          {
+            warn!(
+              phase = "login onboarding flow receive",
+              retry_count, "{e:#}"
+            );
+            // If error transitions from login to connection,
+            // reset these to see the next login / onboarding error.
+            login_errors.reset();
+            onboarding_errors.reset();
+          }
+          tokio::time::sleep(Duration::from_secs(
+            CONNECTION_RETRY_SECONDS,
+          ))
+          .await;
+          continue;
+        }
+      };
+
+      connection_errors.reset();
 
       debug!(
         host = identifiers.host(),
@@ -110,15 +121,18 @@ pub async fn handler(
         } else {
           Err(anyhow!("Server '{}' does not exist or is misconfigured, and no PERIPHERY_ONBOARDING_KEY is provided.", config.connect_as))
         }) {
-          if !already_logged_onboarding_error {
-            error!("{e:#}");
-            already_logged_onboarding_error = true;
+          if let Some(retry_count) =
+            onboarding_errors.record_failure(Instant::now())
+          {
+            error!(phase = "onboarding flow", retry_count, "{e:#}");
           }
           tokio::time::sleep(Duration::from_secs(
             CONNECTION_RETRY_SECONDS,
           ))
           .await;
           continue;
+        } else {
+          onboarding_errors.reset();
         };
       } else {
         let span = info_span!(
@@ -144,11 +158,17 @@ pub async fn handler(
             // No onboarding key available, use original error.
             Ok(false) => e,
             // Onboarding key available but failed.
-            Err(e) => e,
+            Err(onboarding_error) => onboarding_error.context(format!(
+              "Standard login failed before fallback onboarding | {e:#}"
+            )),
           };
-          if !already_logged_login_error {
-            warn!("Failed to login | {e:#}");
-            already_logged_login_error = true;
+          if let Some(retry_count) =
+            login_errors.record_failure(Instant::now())
+          {
+            warn!(
+              phase = "standard login or fallback onboarding",
+              retry_count, "Failed to login | {e:#}"
+            );
           }
           tokio::time::sleep(Duration::from_secs(
             CONNECTION_RETRY_SECONDS,
@@ -157,7 +177,7 @@ pub async fn handler(
           continue;
         }
 
-        already_logged_login_error = false;
+        login_errors.reset();
 
         super::handle_socket(
           socket,
@@ -189,6 +209,7 @@ async fn handle_onboarding(
     private_key: onboarding_key,
     identifiers,
     public_key_validator: core_public_keys(),
+    auth_timeout: config.connection_auth_timeout_duration(),
     socket: &mut socket,
     should_close: true,
   })
@@ -204,7 +225,9 @@ async fn handle_onboarding(
     .context("Failed to send public key bytes")?;
 
   socket
-    .recv_login_success()
+    .recv_login_success_with_timeout(
+      config.connection_auth_timeout_duration(),
+    )
     .await
     .context("Failed to receive Server onboarding result")?;
 
@@ -220,12 +243,147 @@ async fn connect_websocket(
   url: &str,
 ) -> anyhow::Result<(TungsteniteWebsocket, HeaderValue)> {
   let config = periphery_config();
-  TungsteniteWebsocket::connect_maybe_tls_insecure(url, config.core_tls_insecure_skip_verify)
-    .await
-    .map_err(|e| match e.status {
-      StatusCode::NOT_FOUND => anyhow!("404 Not Found: Server '{}' does not exist.", config.connect_as),
-      StatusCode::BAD_REQUEST => anyhow!("400 Bad Request: Server '{}' is disabled or configured to make Core → Periphery connection", config.connect_as),
-      StatusCode::UNAUTHORIZED => anyhow!("401 Unauthorized: Only one Server connected as '{}' is allowed. Or the Core reverse proxy needs to forward host and websocket headers.", config.connect_as),
-      _ => e.error,
-    })
+  connect_websocket_with_options(
+    url,
+    config.core_tls_insecure_skip_verify,
+    config.outbound_connect_timeout_duration(),
+    &config.connect_as,
+  )
+  .await
+}
+
+async fn connect_websocket_with_options(
+  url: &str,
+  tls_insecure_skip_verify: bool,
+  timeout: Option<Duration>,
+  connect_as: &str,
+) -> anyhow::Result<(TungsteniteWebsocket, HeaderValue)> {
+  let connect = TungsteniteWebsocket::connect_maybe_tls_insecure(
+    url,
+    tls_insecure_skip_verify,
+  );
+  let res = if let Some(timeout) = timeout {
+    tokio::time::timeout(timeout, connect).await.with_context(
+      || {
+        format!(
+          "Timed out after {} seconds connecting to Core websocket",
+          timeout.as_secs()
+        )
+      },
+    )?
+  } else {
+    connect.await
+  };
+  res.map_err(|e| match e.status {
+    StatusCode::NOT_FOUND => anyhow!("404 Not Found: Server '{connect_as}' does not exist."),
+    StatusCode::BAD_REQUEST => anyhow!("400 Bad Request: Server '{connect_as}' is disabled or configured to make Core → Periphery connection"),
+    StatusCode::UNAUTHORIZED => anyhow!("401 Unauthorized: Only one Server connected as '{connect_as}' is allowed. Or the Core reverse proxy needs to forward host and websocket headers."),
+    _ => e.error,
+  })
+}
+
+#[derive(Default)]
+struct RetryLogState {
+  failures: u64,
+  last_logged_at: Option<Instant>,
+}
+
+impl RetryLogState {
+  fn record_failure(&mut self, now: Instant) -> Option<u64> {
+    self.failures += 1;
+
+    let should_log = self.failures == 1
+      || self.failures.is_multiple_of(RETRY_LOG_EVERY)
+      || self.last_logged_at.is_some_and(|last_logged_at| {
+        now.duration_since(last_logged_at) >= RETRY_LOG_INTERVAL
+      });
+
+    if should_log {
+      self.last_logged_at = Some(now);
+      Some(self.failures)
+    } else {
+      None
+    }
+  }
+
+  fn reset(&mut self) {
+    self.failures = 0;
+    self.last_logged_at = None;
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn retry_log_state_logs_first_failure_and_periodic_repeats() {
+    let mut state = RetryLogState::default();
+    let start = Instant::now();
+
+    assert_eq!(state.record_failure(start), Some(1));
+
+    for offset in 1..11 {
+      assert_eq!(
+        state.record_failure(start + Duration::from_secs(offset)),
+        None
+      );
+    }
+
+    assert_eq!(
+      state.record_failure(start + Duration::from_secs(11)),
+      Some(12)
+    );
+  }
+
+  #[test]
+  fn retry_log_state_logs_after_interval_and_resets() {
+    let mut state = RetryLogState::default();
+    let start = Instant::now();
+
+    assert_eq!(state.record_failure(start), Some(1));
+    assert_eq!(
+      state.record_failure(start + Duration::from_secs(30)),
+      None
+    );
+    assert_eq!(
+      state.record_failure(start + RETRY_LOG_INTERVAL),
+      Some(3)
+    );
+
+    state.reset();
+
+    assert_eq!(
+      state.record_failure(start + RETRY_LOG_INTERVAL),
+      Some(1)
+    );
+  }
+
+  #[tokio::test]
+  async fn outbound_connect_timeout_covers_websocket_upgrade() {
+    let listener =
+      tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let address = listener.local_addr().unwrap();
+    let stalled_server = tokio::spawn(async move {
+      let (_socket, _) = listener.accept().await.unwrap();
+      std::future::pending::<()>().await;
+    });
+
+    let result = connect_websocket_with_options(
+      &format!("ws://{address}"),
+      false,
+      Some(Duration::from_secs(1)),
+      "timeout-test",
+    )
+    .await;
+    stalled_server.abort();
+    let error = match result {
+      Ok(_) => panic!("websocket upgrade unexpectedly completed"),
+      Err(error) => error,
+    };
+
+    assert!(format!("{error:#}").contains(
+      "Timed out after 1 seconds connecting to Core websocket"
+    ));
+  }
 }

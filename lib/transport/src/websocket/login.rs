@@ -4,6 +4,7 @@ use mogh_pki::SpkiPublicKey;
 use periphery_client::transport::{
   EncodedLoginMessage, LoginMessage, TransportMessage,
 };
+use std::time::Duration;
 
 use crate::{
   auth::AUTH_TIMEOUT,
@@ -23,9 +24,16 @@ pub trait LoginWebsocketExt: WebsocketExt {
   fn recv_login_message(
     &mut self,
   ) -> impl Future<Output = anyhow::Result<LoginMessage>> + Send {
-    async {
+    self.recv_login_message_with_timeout(AUTH_TIMEOUT)
+  }
+
+  fn recv_login_message_with_timeout(
+    &mut self,
+    timeout: Duration,
+  ) -> impl Future<Output = anyhow::Result<LoginMessage>> + Send {
+    async move {
       let TransportMessage::Login(message) =
-        self.recv_message().with_timeout(AUTH_TIMEOUT).await?
+        self.recv_message().with_timeout(timeout).await?
       else {
         return Err(anyhow!(
           "Expected Login message, got other message type"
@@ -38,8 +46,16 @@ pub trait LoginWebsocketExt: WebsocketExt {
   fn recv_login_success(
     &mut self,
   ) -> impl Future<Output = anyhow::Result<()>> + Send {
-    async {
-      let LoginMessage::Success = self.recv_login_message().await?
+    self.recv_login_success_with_timeout(AUTH_TIMEOUT)
+  }
+
+  fn recv_login_success_with_timeout(
+    &mut self,
+    timeout: Duration,
+  ) -> impl Future<Output = anyhow::Result<()>> + Send {
+    async move {
+      let LoginMessage::Success =
+        self.recv_login_message_with_timeout(timeout).await?
       else {
         return Err(anyhow!(
           "Expected Login Success message, got other message type"
@@ -52,9 +68,16 @@ pub trait LoginWebsocketExt: WebsocketExt {
   fn recv_login_nonce(
     &mut self,
   ) -> impl Future<Output = anyhow::Result<[u8; 32]>> + Send {
-    async {
+    self.recv_login_nonce_with_timeout(AUTH_TIMEOUT)
+  }
+
+  fn recv_login_nonce_with_timeout(
+    &mut self,
+    timeout: Duration,
+  ) -> impl Future<Output = anyhow::Result<[u8; 32]>> + Send {
+    async move {
       let LoginMessage::Nonce(nonce) =
-        self.recv_login_message().await?
+        self.recv_login_message_with_timeout(timeout).await?
       else {
         return Err(anyhow!(
           "Expected Login Nonce message, got other message type"
@@ -67,9 +90,16 @@ pub trait LoginWebsocketExt: WebsocketExt {
   fn recv_login_handshake_bytes(
     &mut self,
   ) -> impl Future<Output = anyhow::Result<Vec<u8>>> + Send {
-    async {
+    self.recv_login_handshake_bytes_with_timeout(AUTH_TIMEOUT)
+  }
+
+  fn recv_login_handshake_bytes_with_timeout(
+    &mut self,
+    timeout: Duration,
+  ) -> impl Future<Output = anyhow::Result<Vec<u8>>> + Send {
+    async move {
       let LoginMessage::Handshake(bytes) =
-        self.recv_login_message().await?
+        self.recv_login_message_with_timeout(timeout).await?
       else {
         return Err(anyhow!(
           "Expected Login Handshake message, got other message type"
@@ -82,9 +112,16 @@ pub trait LoginWebsocketExt: WebsocketExt {
   fn recv_login_onboarding_flow(
     &mut self,
   ) -> impl Future<Output = anyhow::Result<bool>> + Send {
-    async {
+    self.recv_login_onboarding_flow_with_timeout(AUTH_TIMEOUT)
+  }
+
+  fn recv_login_onboarding_flow_with_timeout(
+    &mut self,
+    timeout: Duration,
+  ) -> impl Future<Output = anyhow::Result<bool>> + Send {
+    async move {
       let LoginMessage::OnboardingFlow(onboarding_flow) =
-        self.recv_login_message().await?
+        self.recv_login_message_with_timeout(timeout).await?
       else {
         return Err(anyhow!(
           "Expected Login OnboardingFlow message, got other message type"

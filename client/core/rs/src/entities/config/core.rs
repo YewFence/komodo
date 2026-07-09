@@ -9,7 +9,7 @@
 //! into the image at `/config/config.toml`.
 //!
 
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::HashMap, path::PathBuf, time::Duration};
 
 use mogh_auth_client::config::NamedOauthConfig;
 use serde::Deserialize;
@@ -79,6 +79,8 @@ pub struct Env {
   pub komodo_private_key: Option<String>,
   /// Override `private_key` with file
   pub komodo_private_key_file: Option<PathBuf>,
+  /// Override `connection_auth_timeout`
+  pub komodo_connection_auth_timeout: Option<Timelength>,
   /// Override `periphery_public_keys`
   #[serde(alias = "komodo_periphery_public_key")]
   pub komodo_periphery_public_keys: Option<Vec<String>>,
@@ -373,6 +375,11 @@ pub struct CoreConfig {
   /// Default: file:/config/keys/core.key
   #[serde(default = "default_private_key")]
   pub private_key: String,
+
+  /// Timeout for each authentication message during Core / Periphery login.
+  /// Default: `2-sec`
+  #[serde(default = "default_connection_auth_timeout")]
+  pub connection_auth_timeout: Timelength,
 
   /// Default accepted public keys to allow Periphery to connect.
   /// Core gains knowledge of the Periphery public key through the noise handshake.
@@ -920,6 +927,10 @@ fn default_monitoring_interval() -> Timelength {
   Timelength::FifteenSeconds
 }
 
+fn default_connection_auth_timeout() -> Timelength {
+  Timelength::TwoSeconds
+}
+
 fn default_ssl_key_file() -> String {
   "/config/ssl/key.pem".to_string()
 }
@@ -937,6 +948,7 @@ impl Default for CoreConfig {
       bind_ip: default_core_bind_ip(),
       internet_interface: Default::default(),
       private_key: default_private_key(),
+      connection_auth_timeout: default_connection_auth_timeout(),
       periphery_public_keys: Default::default(),
       passkey: Default::default(),
       timezone: Default::default(),
@@ -1025,6 +1037,7 @@ impl CoreConfig {
       } else {
         empty_or_redacted(&self.private_key)
       },
+      connection_auth_timeout: config.connection_auth_timeout,
       periphery_public_keys: config.periphery_public_keys,
       passkey: config.passkey.as_deref().map(empty_or_redacted),
       timezone: config.timezone,
@@ -1164,6 +1177,10 @@ impl CoreConfig {
       && !self.oidc_provider.is_empty()
       && !self.oidc_client_id.is_empty()
   }
+
+  pub fn connection_auth_timeout_duration(&self) -> Duration {
+    self.connection_auth_timeout.into()
+  }
 }
 
 /// Provide AWS credentials for Komodo to use.
@@ -1229,5 +1246,47 @@ impl mogh_server::session::SessionConfig for &CoreConfig {
   }
   fn allow_cross_site(&self) -> bool {
     self.session_allow_cross_site
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn connection_auth_timeout_defaults_to_two_seconds() {
+    assert_eq!(
+      CoreConfig::default().connection_auth_timeout_duration(),
+      Duration::from_secs(2)
+    );
+  }
+
+  #[test]
+  fn connection_auth_timeout_deserializes_from_config() {
+    let config: CoreConfig = serde_json::from_str(
+      r#"
+        { "connection_auth_timeout": "10-sec" }
+      "#,
+    )
+    .unwrap();
+
+    assert_eq!(
+      config.connection_auth_timeout_duration(),
+      Duration::from_secs(10)
+    );
+  }
+
+  #[test]
+  fn connection_auth_timeout_deserializes_from_environment() {
+    let env: Env = envy::from_iter([(
+      "KOMODO_CONNECTION_AUTH_TIMEOUT".to_string(),
+      "10-sec".to_string(),
+    )])
+    .unwrap();
+
+    assert_eq!(
+      env.komodo_connection_auth_timeout,
+      Some(Timelength::TenSeconds)
+    );
   }
 }

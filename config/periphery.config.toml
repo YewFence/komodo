@@ -146,6 +146,20 @@ exclude_disk_mounts = []
 ## Default: None
 # connect_as = "server-name"
 
+## Timeout for each authentication message during Core / Periphery login.
+## Increase this for slow or relayed networks.
+## Env: PERIPHERY_CONNECTION_AUTH_TIMEOUT
+## Options: https://docs.rs/komodo_client/latest/komodo_client/entities/enum.Timelength.html
+## Default: 2-sec
+# connection_auth_timeout = "10-sec"
+
+## Optional timeout for outbound websocket connect attempts.
+## If unset, websocket connect keeps its previous behavior.
+## Env: PERIPHERY_OUTBOUND_CONNECT_TIMEOUT
+## Options: https://docs.rs/komodo_client/latest/komodo_client/entities/enum.Timelength.html
+## Default: None
+# outbound_connect_timeout = "15-sec"
+
 ## Make Onboarding Keys in Server settings.
 ## Not needed if connecting as Server that already exists.
 ## Env: PERIPHERY_ONBOARDING_KEY

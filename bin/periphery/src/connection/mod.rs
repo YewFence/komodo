@@ -56,6 +56,8 @@ async fn handle_login<W: Websocket, L: LoginFlow>(
     identifiers,
     private_key: periphery_keys().load().private.as_str(),
     public_key_validator: core_public_keys(),
+    auth_timeout: periphery_config()
+      .connection_auth_timeout_duration(),
     should_close,
   })
   .await

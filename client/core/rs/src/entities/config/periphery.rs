@@ -15,7 +15,9 @@
 use clap::Parser;
 use ipnetwork::IpNetwork;
 use serde::Deserialize;
-use std::{collections::HashMap, path::PathBuf, sync::OnceLock};
+use std::{
+  collections::HashMap, path::PathBuf, sync::OnceLock, time::Duration,
+};
 
 use crate::{
   deserializers::{
@@ -160,6 +162,10 @@ pub struct Env {
   pub periphery_core_tls_insecure_skip_verify: Option<bool>,
   /// Override `connect_as`
   pub periphery_connect_as: Option<String>,
+  /// Override `connection_auth_timeout`
+  pub periphery_connection_auth_timeout: Option<Timelength>,
+  /// Override `outbound_connect_timeout`
+  pub periphery_outbound_connect_timeout: Option<Timelength>,
   /// Override `server_enabled`
   pub periphery_server_enabled: Option<bool>,
   /// Override `port`
@@ -285,6 +291,16 @@ pub struct PeripheryConfig {
   /// Server name / id to connect as
   #[serde(default)]
   pub connect_as: String,
+
+  /// Timeout for each authentication message during Core / Periphery login.
+  /// Default: `2-sec`
+  #[serde(default = "default_connection_auth_timeout")]
+  pub connection_auth_timeout: Timelength,
+
+  /// Optional timeout for outbound websocket connect attempts.
+  /// Default: none
+  #[serde(skip_serializing_if = "Option::is_none")]
+  pub outbound_connect_timeout: Option<Timelength>,
 
   // ======================
   // = INBOUND CONNECTION =
@@ -460,6 +476,10 @@ fn default_container_stats_polling_rate() -> Timelength {
   Timelength::ThirtySeconds
 }
 
+fn default_connection_auth_timeout() -> Timelength {
+  Timelength::TwoSeconds
+}
+
 fn default_ssl_enabled() -> bool {
   true
 }
@@ -474,6 +494,8 @@ impl Default for PeripheryConfig {
       core_addresses: Default::default(),
       core_tls_insecure_skip_verify: Default::default(),
       connect_as: Default::default(),
+      connection_auth_timeout: default_connection_auth_timeout(),
+      outbound_connect_timeout: None,
       server_enabled: Default::default(),
       port: default_periphery_port(),
       bind_ip: default_periphery_bind_ip(),
@@ -525,6 +547,8 @@ impl PeripheryConfig {
       core_tls_insecure_skip_verify: self
         .core_tls_insecure_skip_verify,
       connect_as: self.connect_as.clone(),
+      connection_auth_timeout: self.connection_auth_timeout,
+      outbound_connect_timeout: self.outbound_connect_timeout,
       server_enabled: self.server_enabled,
       port: self.port,
       bind_ip: self.bind_ip.clone(),
@@ -612,6 +636,16 @@ impl PeripheryConfig {
       self.root_directory.join("keys/core.pub").display()
     );
     Some(vec![path])
+  }
+
+  pub fn connection_auth_timeout_duration(&self) -> Duration {
+    self.connection_auth_timeout.into()
+  }
+
+  pub fn outbound_connect_timeout_duration(
+    &self,
+  ) -> Option<Duration> {
+    self.outbound_connect_timeout.map(Into::into)
   }
 
   pub fn repo_dir(&self) -> PathBuf {
