@@ -40,7 +40,7 @@ use transport::{
 
 use crate::{
   api::write::WriteArgs,
-  config::core_keys,
+  config::{core_config, core_keys},
   helpers::query::id_or_name_filter,
   monitor::refresh_server_cache,
   resource::KomodoResource,
@@ -165,6 +165,7 @@ async fn existing_server_handler(
         identifiers: identifiers.build(query.as_bytes()),
         private_key: core_keys().load().private.as_str(),
         public_key_validator: OnboardingKeyValidator { privileged_required: true },
+        auth_timeout: core_config().connection_auth_timeout_duration(),
         should_close: true
       })
       .await
@@ -236,6 +237,7 @@ async fn fix_existing_server_handler(
       identifiers: identifiers.build(query.as_bytes()),
       private_key: core_keys().load().private.as_str(),
       public_key_validator: OnboardingKeyValidator { privileged_required: true },
+      auth_timeout: core_config().connection_auth_timeout_duration(),
       should_close: true,
     })
     .await
@@ -357,6 +359,7 @@ async fn onboard_new_server_handler(
       identifiers: identifiers.build(query.as_bytes()),
       private_key: core_keys().load().private.as_str(),
       public_key_validator: OnboardingKeyValidator { privileged_required: false },
+      auth_timeout: core_config().connection_auth_timeout_duration(),
       should_close: true
     })
     .await

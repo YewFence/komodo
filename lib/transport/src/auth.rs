@@ -28,6 +28,7 @@ pub struct LoginFlowArgs<'a, 's, V, W> {
   pub identifiers: ConnectionIdentifiers<'a>,
   pub private_key: &'a str,
   pub public_key_validator: V,
+  pub auth_timeout: Duration,
   pub should_close: bool,
   pub socket: &'s mut W,
 }
@@ -48,6 +49,7 @@ impl LoginFlow for ServerLoginFlow {
       identifiers,
       private_key,
       public_key_validator,
+      auth_timeout,
       should_close,
       socket,
     }: LoginFlowArgs<'a, 's, V, W>,
@@ -71,7 +73,7 @@ impl LoginFlow for ServerLoginFlow {
 
       // Receive and read handshake_m1
       let handshake_m1 = socket
-        .recv_login_handshake_bytes()
+        .recv_login_handshake_bytes_with_timeout(auth_timeout)
         .await
         .context("[Server] Failed to get handshake_m1")?;
       handshake
@@ -89,7 +91,7 @@ impl LoginFlow for ServerLoginFlow {
 
       // Receive and read handshake_m3
       let handshake_m3 = socket
-        .recv_login_handshake_bytes()
+        .recv_login_handshake_bytes_with_timeout(auth_timeout)
         .await
         .context("[Server] Failed to get handshake_m3")?;
       handshake
@@ -141,6 +143,7 @@ impl LoginFlow for ClientLoginFlow {
       identifiers,
       private_key,
       public_key_validator,
+      auth_timeout,
       should_close,
       socket,
     }: LoginFlowArgs<'a, 's, V, W>,
@@ -148,7 +151,7 @@ impl LoginFlow for ClientLoginFlow {
     let res = async {
       // Receive nonce and channel from server
       let nonce = socket
-        .recv_login_nonce()
+        .recv_login_nonce_with_timeout(auth_timeout)
         .await
         .context("[Client] Failed to receive connection nonce")?;
 
@@ -171,7 +174,7 @@ impl LoginFlow for ClientLoginFlow {
 
       // Receive and read handshake_m2
       let handshake_m2 = socket
-        .recv_login_handshake_bytes()
+        .recv_login_handshake_bytes_with_timeout(auth_timeout)
         .await
         .context("[Client] Failed to get handshake_m2")?;
       handshake
@@ -197,9 +200,12 @@ impl LoginFlow for ClientLoginFlow {
         .context("[Client] Failed to send handshake_m3")?;
 
       // Receive login sucessful
-      socket.recv_login_success().await.context(
-        "[Client] Failed to receive Login Success message",
-      )?;
+      socket
+        .recv_login_success_with_timeout(auth_timeout)
+        .await
+        .context(
+          "[Client] Failed to receive Login Success message",
+        )?;
 
       anyhow::Ok(validation_result)
     }

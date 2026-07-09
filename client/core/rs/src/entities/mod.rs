@@ -1,6 +1,7 @@
 use std::{
   path::{Path, PathBuf},
   str::FromStr,
+  time::Duration,
 };
 
 use anyhow::{Context, anyhow};
@@ -881,6 +882,43 @@ pub enum Timelength {
   #[serde(rename = "30-day")]
   #[strum(serialize = "30-day")]
   ThirtyDays,
+}
+
+impl From<Timelength> for Duration {
+  fn from(timelength: Timelength) -> Self {
+    match timelength {
+      Timelength::OneSecond => Duration::from_secs(1),
+      Timelength::TwoSeconds => Duration::from_secs(2),
+      Timelength::ThreeSeconds => Duration::from_secs(3),
+      Timelength::FiveSeconds => Duration::from_secs(5),
+      Timelength::TenSeconds => Duration::from_secs(10),
+      Timelength::FifteenSeconds => Duration::from_secs(15),
+      Timelength::ThirtySeconds => Duration::from_secs(30),
+      Timelength::OneMinute => Duration::from_secs(60),
+      Timelength::TwoMinutes => Duration::from_secs(2 * 60),
+      Timelength::ThreeMinutes => Duration::from_secs(3 * 60),
+      Timelength::FiveMinutes => Duration::from_secs(5 * 60),
+      Timelength::TenMinutes => Duration::from_secs(10 * 60),
+      Timelength::FifteenMinutes => Duration::from_secs(15 * 60),
+      Timelength::ThirtyMinutes => Duration::from_secs(30 * 60),
+      Timelength::OneHour => Duration::from_secs(60 * 60),
+      Timelength::TwoHours => Duration::from_secs(2 * 60 * 60),
+      Timelength::ThreeHours => Duration::from_secs(3 * 60 * 60),
+      Timelength::SixHours => Duration::from_secs(6 * 60 * 60),
+      Timelength::EightHours => Duration::from_secs(8 * 60 * 60),
+      Timelength::TwelveHours => Duration::from_secs(12 * 60 * 60),
+      Timelength::OneDay => Duration::from_secs(24 * 60 * 60),
+      Timelength::TwoDays => Duration::from_secs(2 * 24 * 60 * 60),
+      Timelength::ThreeDays => Duration::from_secs(3 * 24 * 60 * 60),
+      Timelength::OneWeek => Duration::from_secs(7 * 24 * 60 * 60),
+      Timelength::TwoWeeks => {
+        Duration::from_secs(2 * 7 * 24 * 60 * 60)
+      }
+      Timelength::ThirtyDays => {
+        Duration::from_secs(30 * 24 * 60 * 60)
+      }
+    }
+  }
 }
 
 impl TryInto<async_timing_util::Timelength> for Timelength {

@@ -157,6 +157,9 @@ pub fn core_config() -> &'static CoreConfig {
         env.komodo_private_key,
       )
       .unwrap_or(config.private_key),
+      connection_auth_timeout: env
+        .komodo_connection_auth_timeout
+        .unwrap_or(config.connection_auth_timeout),
       passkey: maybe_read_item_from_file(
         env.komodo_passkey_file,
         env.komodo_passkey,

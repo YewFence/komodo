@@ -49,6 +49,13 @@ bind_ip = "[::]"
 ## Default: file:/config/keys/core.key
 private_key = "file:/config/keys/core.key"
 
+## Timeout for each authentication message during Core / Periphery login.
+## Increase this for slow or relayed networks.
+## Env: KOMODO_CONNECTION_AUTH_TIMEOUT
+## Options: https://docs.rs/komodo_client/latest/komodo_client/entities/enum.Timelength.html
+## Default: 2-sec
+# connection_auth_timeout = "10-sec"
+
 ## Default accepted public key to allow Periphery to connect.
 ## If not provided, Periphery -> Core connected Servers must
 ## configure accepted public keys individually.

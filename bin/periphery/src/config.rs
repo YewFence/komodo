@@ -97,6 +97,12 @@ pub fn periphery_config() -> &'static PeripheryConfig {
       connect_as: env
         .periphery_connect_as
         .unwrap_or(config.connect_as),
+      connection_auth_timeout: env
+        .periphery_connection_auth_timeout
+        .unwrap_or(config.connection_auth_timeout),
+      outbound_connect_timeout: env
+        .periphery_outbound_connect_timeout
+        .or(config.outbound_connect_timeout),
       server_enabled: env
         .periphery_server_enabled
         .or(config.server_enabled),
