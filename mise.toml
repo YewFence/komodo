@@ -1,0 +1,128 @@
+[settings]
+lockfile = true
+env_shell_expand = true
+minimum_release_age = "3d"
+
+[tools]
+# https://www.rust-lang.org/
+rust = "1.95.0"
+# https://github.com/RustSec/rustsec/tree/main/cargo-audit
+"cargo:cargo-audit" = "0.22"
+# https://github.com/jdx/hk
+hk = "1"
+# https://github.com/suzuki-shunsuke/nllint
+"github:suzuki-shunsuke/nllint" = "1"
+# https://github.com/suzuki-shunsuke/pinact
+pinact = "4"
+# https://github.com/crate-ci/typos
+typos = "1.48.0"
+betterleaks = "1"
+actionlint = "1"
+
+[vars]
+nllint_excludes = ""
+# example: exclude file
+# nllint_excludes = "':(top,exclude)file'"
+
+[env]
+# the minimum release age of github actions in days
+PINACT_MIN_AGE = "3"
+PINACT_GITHUB_TOKEN = { value = "${MISE_GITHUB_TOKEN:-}", redact = true }
+
+[tasks."deps:check"]
+description = "Check Cargo dependency metadata and the lockfile"
+run = "cargo metadata --locked --format-version 1 --no-deps >/dev/null"
+
+[tasks."deps:fix"]
+description = "Resolve Cargo dependencies and update the lockfile when needed"
+run = "cargo metadata --format-version 1 --no-deps >/dev/null"
+
+[tasks."deps:update"]
+description = "Update Cargo dependencies within declared version requirements"
+run = "cargo update"
+
+[tasks.test]
+description = "Run Rust workspace tests"
+run = "cargo test --workspace --locked"
+
+[tasks."fmt:check"]
+description = "Check Rust formatting"
+run = "cargo fmt --all -- --check"
+
+[tasks."fmt:fix"]
+description = "Format the Rust workspace"
+run = "cargo fmt --all"
+
+[tasks.lint]
+description = "Run Clippy for every workspace target"
+run = "cargo clippy --workspace --all-targets --locked -- -D warnings"
+
+[tasks.build]
+description = "Build the Rust workspace in release mode"
+run = "cargo build --workspace --release --locked"
+
+[tasks."build:check"]
+description = "Check every Rust workspace target"
+run = "cargo check --workspace --all-targets --locked"
+
+[tasks.audit]
+description = "Audit Cargo dependencies for known vulnerabilities"
+run = "cargo audit"
+
+[tasks."leaks:check"]
+description = "Run betterleaks checks"
+run = "betterleaks git --redact --no-banner"
+
+[tasks."typos:check"]
+description = "Run Typos Lint"
+run = "typos"
+
+[tasks."typos:fix"]
+description = "Fix Typos Lint"
+run = "typos --write-changes"
+
+[tasks."newline:check"]
+description = "Check final newlines and surrounding whitespace in tracked text files"
+run = "git grep -Ilz '' -- . {{ vars.nllint_excludes }} | xargs -0 nllint --trim-space"
+
+[tasks."newline:fix"]
+description = "Fix final newlines and surrounding whitespace in tracked text files"
+run = "git grep -Ilz '' -- . {{ vars.nllint_excludes }} | xargs -0 nllint --fix --trim-space"
+
+[tasks.check]
+description = "Run read-only project and repository checks"
+run = [
+  { tasks = [ "deps:check", "newline:check", "typos:check", "fmt:check", "build:check" ] },
+  { task = "leaks:check" },
+  { task = "actions:check" },
+  { task = "lint" },
+  { task = "test" }
+]
+alias = "c"
+
+[tasks.fix]
+description = "Fix project and repository formatting"
+run = [
+  { task = "deps:fix" },
+  { task = "newline:fix" },
+  { task = "typos:fix" },
+  { task = "fmt:fix" }
+]
+alias = "f"
+
+[tasks.'hooks:install']
+description = "Install Git hooks managed by hk"
+run = "hk install"
+
+[tasks."actions:check"]
+description = "Run actionlint"
+depends = ["actions:pin-offline:check"]
+run = "actionlint"
+
+[tasks.'actions:update']
+description = "Update GitHub Action versions and pin to commit hashes"
+run = "pinact run --update"
+
+[tasks.'actions:pin-offline:check']
+description = "Check GitHub Action versions and pin to commit hashes"
+run = "unset PINACT_MIN_AGE && pinact run --fix=false --no-api"
