@@ -97,84 +97,84 @@ async fn execute_procedure_stage(
   for execution in _executions {
     match execution {
       Execution::BatchRunAction(exec) => {
-        extend_batch_exection::<BatchRunAction>(
+        extend_batch_execution::<BatchRunAction>(
           &exec.pattern,
           &mut executions,
         )
         .await?;
       }
       Execution::BatchRunProcedure(exec) => {
-        extend_batch_exection::<BatchRunProcedure>(
+        extend_batch_execution::<BatchRunProcedure>(
           &exec.pattern,
           &mut executions,
         )
         .await?;
       }
       Execution::BatchRunBuild(exec) => {
-        extend_batch_exection::<BatchRunBuild>(
+        extend_batch_execution::<BatchRunBuild>(
           &exec.pattern,
           &mut executions,
         )
         .await?;
       }
       Execution::BatchCloneRepo(exec) => {
-        extend_batch_exection::<BatchCloneRepo>(
+        extend_batch_execution::<BatchCloneRepo>(
           &exec.pattern,
           &mut executions,
         )
         .await?;
       }
       Execution::BatchPullRepo(exec) => {
-        extend_batch_exection::<BatchPullRepo>(
+        extend_batch_execution::<BatchPullRepo>(
           &exec.pattern,
           &mut executions,
         )
         .await?;
       }
       Execution::BatchBuildRepo(exec) => {
-        extend_batch_exection::<BatchBuildRepo>(
+        extend_batch_execution::<BatchBuildRepo>(
           &exec.pattern,
           &mut executions,
         )
         .await?;
       }
       Execution::BatchDeploy(exec) => {
-        extend_batch_exection::<BatchDeploy>(
+        extend_batch_execution::<BatchDeploy>(
           &exec.pattern,
           &mut executions,
         )
         .await?;
       }
       Execution::BatchDestroyDeployment(exec) => {
-        extend_batch_exection::<BatchDestroyDeployment>(
+        extend_batch_execution::<BatchDestroyDeployment>(
           &exec.pattern,
           &mut executions,
         )
         .await?;
       }
       Execution::BatchDeployStack(exec) => {
-        extend_batch_exection::<BatchDeployStack>(
+        extend_batch_execution::<BatchDeployStack>(
           &exec.pattern,
           &mut executions,
         )
         .await?;
       }
       Execution::BatchDeployStackIfChanged(exec) => {
-        extend_batch_exection::<BatchDeployStackIfChanged>(
+        extend_batch_execution::<BatchDeployStackIfChanged>(
           &exec.pattern,
           &mut executions,
         )
         .await?;
       }
       Execution::BatchPullStack(exec) => {
-        extend_batch_exection::<BatchPullStack>(
+        extend_batch_execution::<BatchPullStack>(
           &exec.pattern,
           &mut executions,
         )
         .await?;
       }
       Execution::BatchDestroyStack(exec) => {
-        extend_batch_exection::<BatchDestroyStack>(
+        extend_batch_execution::<BatchDestroyStack>(
           &exec.pattern,
           &mut executions,
         )
@@ -529,7 +529,7 @@ async fn add_line_to_update(update: &Mutex<Update>, line: &str) {
   };
 }
 
-async fn extend_batch_exection<E: ExtendBatch>(
+async fn extend_batch_execution<E: ExtendBatch>(
   pattern: &str,
   executions: &mut Vec<Execution>,
 ) -> anyhow::Result<()> {

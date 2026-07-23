@@ -336,7 +336,7 @@ pub struct AlerterQuerySpecifics {
   pub enabled: Option<bool>,
 
   /// Only include alerters with these endpoint types.
-  /// If empty, don't filter by enpoint type.
+  /// If empty, don't filter by endpoint type.
   pub types: Vec<AlerterEndpointVariant>,
 }
 

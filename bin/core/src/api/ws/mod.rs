@@ -43,7 +43,7 @@ async fn user_ws_login(
       .await
       .context("Failed to receive message over socket: Closed")
       .status_code(StatusCode::BAD_REQUEST)?
-      .context("Failed to recieve message over socket: Error")
+      .context("Failed to receive message over socket: Error")
       .status_code(StatusCode::BAD_REQUEST)?
     {
       ws::Message::Text(utf8_bytes) => utf8_bytes.to_string(),

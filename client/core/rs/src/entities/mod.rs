@@ -520,7 +520,7 @@ pub struct MaintenanceWindow {
   pub minute: u8,
   /// Duration of the maintenance window in minutes (required)
   pub duration_minutes: u32,
-  /// Timezone for maintenance window specificiation.
+  /// Timezone for maintenance window specification.
   /// If empty, will use Core timezone.
   #[serde(default)]
   pub timezone: String,

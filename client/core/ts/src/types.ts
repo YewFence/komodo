@@ -278,7 +278,7 @@ export interface MaintenanceWindow {
 	/** Duration of the maintenance window in minutes (required) */
 	duration_minutes: number;
 	/**
-	 * Timezone for maintenance window specificiation.
+	 * Timezone for maintenance window specification.
 	 * If empty, will use Core timezone.
 	 */
 	timezone?: string;
@@ -332,7 +332,7 @@ export interface AlerterQuerySpecifics {
 	enabled?: boolean;
 	/**
 	 * Only include alerters with these endpoint types.
-	 * If empty, don't filter by enpoint type.
+	 * If empty, don't filter by endpoint type.
 	 */
 	types: AlerterEndpoint["type"][];
 }
@@ -632,7 +632,7 @@ export interface BuildConfig {
 	 * 
 	 * Can be used in conjunction with `image_tag` to direct multiple builds
 	 * with different configs to push to the same image registry, under different,
-	 * independantly versioned tags.
+	 * independently versioned tags.
 	 */
 	image_name?: string;
 	/**
@@ -642,7 +642,7 @@ export interface BuildConfig {
 	 * 
 	 * Can be used in conjunction with `image_name` to direct multiple builds
 	 * with different configs to push to the same image registry, under different,
-	 * independantly versioned tags.
+	 * independently versioned tags.
 	 */
 	image_tag?: string;
 	/** Push `:latest` / `:latest-image_tag` tags. */
@@ -853,7 +853,7 @@ export interface BuilderQuerySpecifics {
 
 export type BuilderQuery = ResourceQuery<BuilderQuerySpecifics>;
 
-/** A wrapper for all Komodo exections. */
+/** A wrapper for all Komodo executions. */
 export type Execution = 
 	/** The "null" execution. Does nothing. */
 	| { type: "None", params: NoData }
@@ -1145,7 +1145,7 @@ export interface User {
 	username: string;
 	/** Whether user is enabled / able to access the api. */
 	enabled?: boolean;
-	/** Can give / take other users admin priviledges. */
+	/** Can give / take other users admin privileges. */
 	super_admin?: boolean;
 	/** Whether the user has global admin permissions. */
 	admin?: boolean;
@@ -2332,17 +2332,17 @@ export interface ServerConfig {
 	send_disk_alerts: boolean;
 	/** Whether to send alerts about the servers version mismatch with core */
 	send_version_mismatch_alerts: boolean;
-	/** The percentage threshhold which triggers WARNING state for CPU. */
+	/** The percentage threshold which triggers WARNING state for CPU. */
 	cpu_warning: number;
-	/** The percentage threshhold which triggers CRITICAL state for CPU. */
+	/** The percentage threshold which triggers CRITICAL state for CPU. */
 	cpu_critical: number;
-	/** The percentage threshhold which triggers WARNING state for MEM. */
+	/** The percentage threshold which triggers WARNING state for MEM. */
 	mem_warning: number;
-	/** The percentage threshhold which triggers CRITICAL state for MEM. */
+	/** The percentage threshold which triggers CRITICAL state for MEM. */
 	mem_critical: number;
-	/** The percentage threshhold which triggers WARNING state for DISK. */
+	/** The percentage threshold which triggers WARNING state for DISK. */
 	disk_warning: number;
-	/** The percentage threshhold which triggers CRITICAL state for DISK. */
+	/** The percentage threshold which triggers CRITICAL state for DISK. */
 	disk_critical: number;
 	/** Scheduled maintenance windows during which alerts will be suppressed. */
 	maintenance_windows?: MaintenanceWindow[];
@@ -3124,7 +3124,7 @@ export interface MountBindOptions {
 	NonRecursive?: boolean;
 	/** Create mount point on host if missing */
 	CreateMountpoint?: boolean;
-	/** Make the mount non-recursively read-only, but still leave the mount recursive (unless NonRecursive is set to `true` in conjunction).  Addded in v1.44, before that version all read-only mounts were non-recursive by default. To match the previous behaviour this will default to `true` for clients on versions prior to v1.44. */
+	/** Make the mount non-recursively read-only, but still leave the mount recursive (unless NonRecursive is set to `true` in conjunction).  Added in v1.44, before that version all read-only mounts were non-recursive by default. To match the previous behaviour this will default to `true` for clients on versions prior to v1.44. */
 	ReadOnlyNonRecursive?: boolean;
 	/** Raise an error if the mount cannot be made recursively read-only. */
 	ReadOnlyForceRecursive?: boolean;
@@ -4951,7 +4951,7 @@ export interface ContainerListItem {
 	ports?: Port[];
 	/** The volume names attached to container */
 	volumes?: string[];
-	/** The container stats, if they can be retreived. */
+	/** The container stats, if they can be retrieved. */
 	stats?: ContainerStats;
 	/**
 	 * The labels attached to container.
@@ -5048,7 +5048,7 @@ export interface ImageListItem {
 	tags?: string[];
 	/** The unchanged `RepoDigests`. */
 	digests?: string[];
-	/** Date and time at which the image was created as a Unix timestamp (number of seconds sinds EPOCH). */
+	/** Date and time at which the image was created as a Unix timestamp (number of seconds since EPOCH). */
 	created: I64;
 	/** Total size of the image including all layers it is composed of. */
 	size: I64;
@@ -5422,7 +5422,7 @@ export enum StackState {
 	Running = "running",
 	/** All containers are paused */
 	Paused = "paused",
-	/** All contianers are stopped */
+	/** All containers are stopped */
 	Stopped = "stopped",
 	/** All containers are created */
 	Created = "created",
@@ -6718,7 +6718,7 @@ export interface CreateApiKeyForServiceUser {
 	/** The name for the api key */
 	name: string;
 	/**
-	 * A unix timestamp in millseconds specifying api key expire time.
+	 * A unix timestamp in milliseconds specifying api key expire time.
 	 * Default is 0, which means no expiry.
 	 */
 	expires?: I64;
@@ -6822,7 +6822,7 @@ export interface CreateOnboardingKey {
 	/** The name for the creation key */
 	name: string;
 	/**
-	 * A unix timestamp in millseconds specifying api key expire time.
+	 * A unix timestamp in milliseconds specifying api key expire time.
 	 * Default is 0, which means no expiry.
 	 */
 	expires?: I64;
@@ -7007,7 +7007,7 @@ export interface CreateUserGroup {
 export interface CreateVariable {
 	/** The name of the variable to create. */
 	name: string;
-	/** The initial value of the variable. defualt: "". */
+	/** The initial value of the variable. default: "". */
 	value?: string;
 	/** The initial value of the description. default: "". */
 	description?: string;
@@ -7304,7 +7304,7 @@ export interface DeployStackIfChanged {
 
 /**
  * Stops and destroys the container on the target server.
- * Reponse: [Update].
+ * Response: [Update].
  * 
  * 1. The container is stopped and removed using `docker container rm ${container_name}`.
  */
@@ -7321,7 +7321,7 @@ export interface DestroyContainer {
 
 /**
  * Stops and destroys the container for the target deployment.
- * Reponse: [Update].
+ * Response: [Update].
  * 
  * 1. The container is stopped and removed using `docker container rm ${container_name}`.
  */
@@ -7334,7 +7334,7 @@ export interface DestroyDeployment {
 	time?: number;
 }
 
-/** Destoys the target stack. `docker compose down`. Response: [Update] */
+/** Destroys the target stack. `docker compose down`. Response: [Update] */
 export interface DestroyStack {
 	/** Id or name */
 	stack: string;
@@ -9732,7 +9732,7 @@ export interface RunAction {
  * 
  * 1. Get a handle to the builder. If using AWS builder, this means starting a builder ec2 instance.
  * 
- * 2. Clone the repo on the builder. If an `on_clone` commmand is given, it will be executed.
+ * 2. Clone the repo on the builder. If an `on_clone` command is given, it will be executed.
  * 
  * 3. Execute `docker build {...params}`, where params are determined using the builds configuration.
  * 
@@ -11143,4 +11143,3 @@ export type WsLoginMessage =
 	key: string;
 	secret: string;
 }};
-

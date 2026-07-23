@@ -120,7 +120,7 @@ impl Resolve<ExecuteArgs> for CloneRepo {
     )
     .await
     .with_context(
-      || format!("Failed to get git token in call to db. This is a database error, not a token exisitence error. Stopping run. | {} | {}", repo.config.git_provider, repo.config.git_account),
+      || format!("Failed to get git token in call to db. This is a database error, not a token existence error. Stopping run. | {} | {}", repo.config.git_provider, repo.config.git_account),
     )?;
 
     let server =
@@ -256,7 +256,7 @@ impl Resolve<ExecuteArgs> for PullRepo {
     )
     .await
     .with_context(
-      || format!("Failed to get git token in call to db. This is a database error, not a token exisitence error. Stopping run. | {} | {}", repo.config.git_provider, repo.config.git_account),
+      || format!("Failed to get git token in call to db. This is a database error, not a token existence error. Stopping run. | {} | {}", repo.config.git_provider, repo.config.git_account),
     )?;
 
     let server =
@@ -436,7 +436,7 @@ impl Resolve<ExecuteArgs> for BuildRepo {
     )
     .await
     .with_context(
-      || format!("Failed to get git token in call to db. This is a database error, not a token exisitence error. Stopping run. | {} | {}", repo.config.git_provider, repo.config.git_account),
+      || format!("Failed to get git token in call to db. This is a database error, not a token existence error. Stopping run. | {} | {}", repo.config.git_provider, repo.config.git_account),
     )?;
 
     let cancel = CancellationToken::new();
@@ -763,7 +763,7 @@ impl Resolve<ExecuteArgs> for CancelRepoBuild {
       .send((repo.id, update.clone()))?;
 
     // Make sure cancel is set to complete after some time in case
-    // no reciever is there to do it. Prevents update stuck in InProgress.
+    // no receiver is there to do it. Prevents update stuck in InProgress.
     let update_id = update.id.clone();
     tokio::spawn(async move {
       tokio::time::sleep(Duration::from_secs(60)).await;

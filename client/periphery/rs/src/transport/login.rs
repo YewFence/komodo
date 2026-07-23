@@ -51,7 +51,7 @@ pub enum LoginMessage {
   /// Used during Core -> Periphery connections.
   /// If Periphery hasn't set `core_public_keys`,
   /// will fall back to passkey auth
-  /// for backward compatability with v1
+  /// for backward compatibility with v1
   V1PasskeyFlow(bool),
   /// Core will send the passkey to Periphery to validate
   /// in the V1PasskeyLogin flow.

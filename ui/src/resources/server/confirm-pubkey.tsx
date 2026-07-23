@@ -30,7 +30,7 @@ export default function ConfirmServerPubkey({ id }: { id: string }) {
       confirmText={server.name}
       icon={<CircleOff size="1rem" />}
       targetProps={{ color: "red" }}
-      topAdditonal={
+      topAdditional={
         <Group gap="xs">
           <Text c="dimmed">Public Key:</Text>
           {server.info.attempted_public_key}

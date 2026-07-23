@@ -21,10 +21,10 @@ pub async fn handler(
   RequestIp(ip): RequestIp,
   ws: WebSocketUpgrade,
 ) -> impl IntoResponse {
-  // get a reveiver for internal update messages.
+  // get a receiver for internal update messages.
   let mut receiver = update_channel().receiver.resubscribe();
 
-  // handle http -> ws updgrade
+  // handle http -> ws upgrade
   ws.on_upgrade(move |socket| async move {
     let Some((client_socket, user)) =
       super::user_ws_login(socket,  ip).await
@@ -32,7 +32,7 @@ pub async fn handler(
       return;
     };
 
-    let (mut ws_sender, mut ws_reciever) = client_socket.split();
+    let (mut ws_sender, mut ws_receiver) = client_socket.split();
 
     let cancel = CancellationToken::new();
     let cancel_clone = cancel.clone();
@@ -70,7 +70,7 @@ pub async fn handler(
 
     // Handle messages from the client.
     // After login, only handles close message.
-    while let Some(msg) = ws_reciever.next().await {
+    while let Some(msg) = ws_receiver.next().await {
       match msg {
         Ok(msg) => {
           if let Message::Close(_) = msg {

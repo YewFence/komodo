@@ -627,13 +627,13 @@ pub async fn update<T: KomodoResource>(
   match prev_toml {
     Ok(res) => update.prev_toml = res.toml,
     Err(e) => update
-      // These logs are pushed with success == true, so user still knows the update was succesful.
+      // These logs are pushed with success == true, so user still knows the update was successful.
       .push_simple_log("Failed export", format_serror(&e.into())),
   }
   match curr_toml {
     Ok(res) => update.current_toml = res.toml,
     Err(e) => update
-      // These logs are pushed with success == true, so user still knows the update was succesful.
+      // These logs are pushed with success == true, so user still knows the update was successful.
       .push_simple_log("Failed export", format_serror(&e.into())),
   }
 

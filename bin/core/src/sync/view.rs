@@ -80,9 +80,9 @@ pub async fn push_updates_for_view<Resource: ResourceSyncTrait>(
       Some(current_resource) => {
         // First merge toml resource config (partial) onto default resource config.
         // Makes sure things that aren't defined in toml (come through as None) actually get removed.
-        let propsed_config: Resource::Config =
+        let proposed_config: Resource::Config =
           proposed_resource.config.into();
-        proposed_resource.config = propsed_config.into();
+        proposed_resource.config = proposed_config.into();
 
         Resource::validate_partial_config(
           &mut proposed_resource.config,

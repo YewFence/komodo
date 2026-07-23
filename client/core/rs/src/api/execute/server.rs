@@ -195,7 +195,7 @@ pub struct StopContainer {
 pub fn destroy_container() {}
 
 /// Stops and destroys the container on the target server.
-/// Reponse: [Update].
+/// Response: [Update].
 ///
 /// 1. The container is stopped and removed using `docker container rm ${container_name}`.
 #[typeshare]

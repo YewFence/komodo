@@ -68,7 +68,7 @@ impl Resolve<ReadArgs> for ListUsers {
   ) -> mogh_error::Result<ListUsersResponse> {
     if !user.admin {
       return Err(
-        anyhow!("this route is only accessable by admins").into(),
+        anyhow!("this route is only accessible by admins").into(),
       );
     }
     let filter = match self.service_users {

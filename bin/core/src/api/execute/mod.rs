@@ -227,7 +227,7 @@ pub fn inner_handler(
 
     let update = init_execution_update(&request, &user).await?;
 
-    // This will be the case for the Batch exections,
+    // This will be the case for the Batch executions,
     // they don't have their own updates.
     // The batch calls also call "inner_handler" themselves,
     // and in their case will spawn tasks, so that isn't necessary

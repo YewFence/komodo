@@ -22,7 +22,7 @@ pub mod axum;
 pub mod login;
 pub mod tungstenite;
 
-/// Flattened websocket message possibilites
+/// Flattened websocket message possibilities
 /// for easier handling.
 pub enum WebsocketMessage {
   /// Standard message

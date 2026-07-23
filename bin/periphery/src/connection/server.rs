@@ -189,7 +189,7 @@ async fn handle_passkey_login(
       .await
       .context("Failed to send login type indicator")?;
 
-    // Receieve passkey
+    // Receive passkey
     let passkey = socket
       .recv_login_v1_passkey()
       .await

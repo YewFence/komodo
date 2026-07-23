@@ -91,14 +91,14 @@ pub fn read_resources(
         ),
       });
       log.push_str(&format!(
-        "{}: Resoure path {} does not exist.",
+        "{}: Resource path {} does not exist.",
         colored("ERROR", Color::Red),
         bold(resource_path.display())
       ));
       logs.push(Log::error("Read remote resources", log));
     } else {
       log.push_str(&format!(
-        "{}: Resoure path {} exists, but is neither a file nor a directory.",
+        "{}: Resource path {} exists, but is neither a file nor a directory.",
         colored("WARN", Color::Red),
         bold(resource_path.display())
       ));

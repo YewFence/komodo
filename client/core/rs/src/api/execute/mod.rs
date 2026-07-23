@@ -38,7 +38,7 @@ pub mod openapi;
 
 pub trait KomodoExecuteRequest: HasResponse {}
 
-/// A wrapper for all Komodo exections.
+/// A wrapper for all Komodo executions.
 #[typeshare]
 #[derive(
   Debug,

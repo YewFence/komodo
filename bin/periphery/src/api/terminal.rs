@@ -452,7 +452,7 @@ async fn setup_execute_command_on_terminal(
   impl Stream<Item = Result<String, LinesCodecError>> + 'static,
 > {
   // Read the bytes into lines
-  // This is done to check the lines for the EOF sentinal
+  // This is done to check the lines for the EOF sentinel
   let mut stdout = tokio_util::codec::FramedRead::new(
     tokio_util::io::StreamReader::new(
       tokio_stream::wrappers::BroadcastStream::new(

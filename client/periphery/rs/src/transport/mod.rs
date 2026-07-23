@@ -237,7 +237,7 @@ impl Decode<WithChannel<anyhow::Result<Vec<u8>>>>
   ) -> anyhow::Result<WithChannel<anyhow::Result<Vec<u8>>>> {
     Ok(self.0.decode()?.map(|data| {
       data.decode().and_then(|r| {
-        r.context("Terminal should not recieve Pending byte")
+        r.context("Terminal should not receive Pending byte")
       })
     }))
   }

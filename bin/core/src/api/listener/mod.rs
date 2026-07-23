@@ -22,7 +22,7 @@ pub fn router() -> Router {
 
 type ListenerLockCache = CloneCache<String, Arc<Mutex<()>>>;
 
-/// Implemented for all resources which can recieve webhook.
+/// Implemented for all resources which can receive webhook.
 trait CustomSecret: KomodoResource {
   fn custom_secret(
     resource: &Resource<Self::Config, Self::Info>,

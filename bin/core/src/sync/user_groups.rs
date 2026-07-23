@@ -506,7 +506,7 @@ pub async fn run_updates(
   let mut has_error = false;
   let mut log = String::from("running updates on UserGroups");
 
-  // Create the non-existant user groups
+  // Create the non-existent user groups
   for user_group in to_create {
     // Create the user group
     if let Err(e) = (CreateUserGroup {

@@ -144,7 +144,7 @@ pub async fn validate_files(
     .into_iter()
     .map(|file| {
       (
-        // This will remove any intermediate uneeded '/./' in the path
+        // This will remove any intermediate unneeded '/./' in the path
         run_directory
           .join(&file.path)
           .components()

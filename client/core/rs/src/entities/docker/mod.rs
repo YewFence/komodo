@@ -336,7 +336,7 @@ pub struct MountBindOptions {
   #[serde(rename = "CreateMountpoint")]
   pub create_mountpoint: Option<bool>,
 
-  /// Make the mount non-recursively read-only, but still leave the mount recursive (unless NonRecursive is set to `true` in conjunction).  Addded in v1.44, before that version all read-only mounts were non-recursive by default. To match the previous behaviour this will default to `true` for clients on versions prior to v1.44.
+  /// Make the mount non-recursively read-only, but still leave the mount recursive (unless NonRecursive is set to `true` in conjunction).  Added in v1.44, before that version all read-only mounts were non-recursive by default. To match the previous behaviour this will default to `true` for clients on versions prior to v1.44.
   #[serde(rename = "ReadOnlyNonRecursive")]
   pub read_only_non_recursive: Option<bool>,
 
