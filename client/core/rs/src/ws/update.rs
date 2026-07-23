@@ -22,7 +22,7 @@ pub enum UpdateWsMessage {
 pub enum UpdateWsError {
   #[error("Failed to connect | {0}")]
   ConnectionError(String),
-  #[error("Failed to recieve message | {0}")]
+  #[error("Failed to receive message | {0}")]
   MessageError(String),
   #[error("Did not recognize message | {0}")]
   MessageUnrecognized(String),
@@ -97,13 +97,13 @@ impl KomodoClient {
           retry = 0;
 
           // ==================
-          // HANLDE MSGS
+          // HANDLE MSGS
           // ==================
           loop {
             match ws
               .try_next()
               .await
-              .context("failed to recieve message")
+              .context("failed to receive message")
             {
               Ok(Some(Message::Text(msg))) => {
                 match serde_json::from_str::<UpdateListItem>(&msg) {

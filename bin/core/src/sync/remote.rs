@@ -100,7 +100,7 @@ async fn get_repo(
   })?;
 
   // Ensure clone / pull successful,
-  // propogate error log -> 'errored' and return.
+  // propagate error log -> 'errored' and return.
   if let Some(failure) = logs.iter().find(|log| !log.success) {
     return Ok(RemoteResources {
       resources: Err(anyhow!("Repo clone / pull failed")),

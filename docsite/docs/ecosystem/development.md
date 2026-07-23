@@ -18,7 +18,7 @@ Running Komodo from [source](https://github.com/moghtech/komodo) requires either
 
 ### runnables-cli
 
-[mbecker20/runnables-cli](https://github.com/mbecker20/runnables-cli) can be used as a convience CLI for running common project tasks found in `runfile.toml`. Otherwise, you can create your own project tasks by references the `cmd`s found in `runfile.toml`. All instructions below will use runnables-cli v1.3.7+.
+[mbecker20/runnables-cli](https://github.com/mbecker20/runnables-cli) can be used as a convenience CLI for running common project tasks found in `runfile.toml`. Otherwise, you can create your own project tasks by references the `cmd`s found in `runfile.toml`. All instructions below will use runnables-cli v1.3.7+.
 
 ## Docker
 

@@ -244,7 +244,7 @@ pub enum StackState {
   Running,
   /// All containers are paused
   Paused,
-  /// All contianers are stopped
+  /// All containers are stopped
   Stopped,
   /// All containers are created
   Created,

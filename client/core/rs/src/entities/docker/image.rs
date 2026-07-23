@@ -29,7 +29,7 @@ pub struct ImageListItem {
   /// The unchanged `RepoDigests`.
   #[serde(default)]
   pub digests: Vec<String>,
-  /// Date and time at which the image was created as a Unix timestamp (number of seconds sinds EPOCH).
+  /// Date and time at which the image was created as a Unix timestamp (number of seconds since EPOCH).
   pub created: I64,
   /// Total size of the image including all layers it is composed of.
   pub size: I64,

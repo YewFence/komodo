@@ -71,7 +71,7 @@ impl PeripheryClient {
 
   /// Executes command on specified terminal,
   /// and streams the response ending in [KOMODO_EXIT_CODE][komodo_client::entities::KOMODO_EXIT_CODE]
-  /// sentinal value as the expected final line of the stream.
+  /// sentinel value as the expected final line of the stream.
   ///
   /// Example final line:
   /// ```text

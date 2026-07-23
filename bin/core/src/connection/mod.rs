@@ -287,7 +287,7 @@ impl PeripheryConnection {
     Arc<PeripheryConnection>,
     BufferedReceiver<EncodedTransportMessage>,
   ) {
-    let (sender, receiever) = buffered_channel();
+    let (sender, receiver) = buffered_channel();
     (
       PeripheryConnection {
         sender,
@@ -299,7 +299,7 @@ impl PeripheryConnection {
         terminals: Default::default(),
       }
       .into(),
-      receiever,
+      receiver,
     )
   }
 
@@ -312,7 +312,7 @@ impl PeripheryConnection {
   ) {
     // Ensure this connection is cancelled.
     self.cancel();
-    let (sender, receiever) = buffered_channel();
+    let (sender, receiver) = buffered_channel();
     (
       PeripheryConnection {
         sender,
@@ -324,7 +324,7 @@ impl PeripheryConnection {
         terminals: self.terminals.clone(),
       }
       .into(),
-      receiever,
+      receiver,
     )
   }
 

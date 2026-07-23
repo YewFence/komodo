@@ -98,7 +98,7 @@ pub struct RunContainer {
   pub stop_time: Option<i32>,
   /// Override registry token with one sent from core.
   pub registry_token: Option<String>,
-  /// Propogate any secret replacers from core interpolation.
+  /// Propagate any secret replacers from core interpolation.
   #[serde(default)]
   pub replacers: Vec<(String, String)>,
 }

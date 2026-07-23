@@ -35,7 +35,7 @@ pub fn create_onboarding_key() {}
 pub struct CreateOnboardingKey {
   /// The name for the creation key
   pub name: String,
-  /// A unix timestamp in millseconds specifying api key expire time.
+  /// A unix timestamp in milliseconds specifying api key expire time.
   /// Default is 0, which means no expiry.
   #[serde(default)]
   pub expires: I64,

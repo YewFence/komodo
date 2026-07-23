@@ -1,2 +1,5 @@
+[default]
+extend-ignore-identifiers-re = ["^R7iz.*$"]
+
 [type.svg]
 check-file = false

@@ -20,7 +20,7 @@ betterleaks = "1"
 actionlint = "1"
 
 [vars]
-nllint_excludes = ""
+nllint_excludes = "':(top,exclude)LICENSE'"
 # example: exclude file
 # nllint_excludes = "':(top,exclude)file'"
 

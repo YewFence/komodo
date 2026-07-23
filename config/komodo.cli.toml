@@ -2,7 +2,7 @@
 # 🦎 KOMODO CLI CONFIG 🦎 #
 ##########################
 
-## This is the offical "Default" config file for the Komodo CLI.
+## This is the official "Default" config file for the Komodo CLI.
 ## It serves as documentation for the meaning of the fields.
 ## It is located at `https://github.com/moghtech/komodo/blob/main/config/komodo.cli.toml`.
 
@@ -21,7 +21,7 @@ default_profile = "Default"
 # Default: 14
 max_backups = 7
 
-# Options: Horizontal, Veritical, Outside, Inside, All
+# Options: Horizontal, Vertical, Outside, Inside, All
 # Default: Horizontal
 table_borders = "Horizontal"
 
