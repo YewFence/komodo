@@ -120,7 +120,7 @@ fn convert_mount(mount: bollard::models::Mount) -> Mount {
       MountBindOptions {
         propagation: options
           .propagation
-          .map(convert_mount_propogation)
+          .map(convert_mount_propagation)
           .unwrap_or_default(),
         non_recursive: options.non_recursive,
         create_mountpoint: options.create_mountpoint,
@@ -161,10 +161,10 @@ fn convert_mount_type(typ: bollard::config::MountType) -> MountType {
   }
 }
 
-fn convert_mount_propogation(
-  propogation: bollard::config::MountBindOptionsPropagationEnum,
+fn convert_mount_propagation(
+  propagation: bollard::config::MountBindOptionsPropagationEnum,
 ) -> MountBindOptionsPropagationEnum {
-  match propogation {
+  match propagation {
     bollard::config::MountBindOptionsPropagationEnum::EMPTY => {
       MountBindOptionsPropagationEnum::Empty
     }

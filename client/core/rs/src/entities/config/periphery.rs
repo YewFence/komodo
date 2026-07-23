@@ -100,7 +100,7 @@ pub enum Command {
 /// # Periphery Environment Variables
 ///
 /// The variables should be passed in the traditional `UPPER_SNAKE_CASE` format,
-/// although the lower case format can still be parsed. If equivalent paramater is passed
+/// although the lower case format can still be parsed. If equivalent parameter is passed
 /// in [CliArgs], the value passed to the environment will be ignored in favor of the cli arg.
 #[derive(Deserialize)]
 pub struct Env {

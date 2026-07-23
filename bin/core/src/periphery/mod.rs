@@ -112,7 +112,7 @@ impl PeripheryClient {
     connection.bail_if_not_connected().await?;
 
     let channel_id = Uuid::new_v4();
-    let (response_sender, mut response_receiever) = channel();
+    let (response_sender, mut response_receiver) = channel();
     self.responses.insert(channel_id, response_sender).await;
 
     if let Err(e) = connection
@@ -135,7 +135,7 @@ impl PeripheryClient {
       // Poll for the associated response
       loop {
         let message =
-          response_receiever.recv().with_timeout(timeout).await?;
+          response_receiver.recv().with_timeout(timeout).await?;
 
         // Still in progress, sent to avoid timeout.
         let Some(message) = message.decode()? else {

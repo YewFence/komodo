@@ -316,7 +316,7 @@ impl Resolve<crate::api::Args> for ComposePull {
       .into_iter()
       .map(|path| {
         (
-          // This will remove any intermediate uneeded '/./' in the path
+          // This will remove any intermediate unneeded '/./' in the path
           run_directory.join(&path).components().collect::<PathBuf>(),
           path,
         )

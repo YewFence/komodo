@@ -420,7 +420,7 @@ export function KomodoClient(url, options) {
          * ```ts
          * await komodo.execute_deployment_terminal(
          *   {
-         *     deployment: "my-deployemnt",
+         *     deployment: "my-deployment",
          *     terminal: "name",
          *     command: 'for i in {1..3}; do echo "$i"; sleep 1; done',
          *     init: {
@@ -465,7 +465,7 @@ export function KomodoClient(url, options) {
          * ```ts
          * await komodo.execute_deployment_exec(
          *   {
-         *     deployment: "my-deployemnt",
+         *     deployment: "my-deployment",
          *     command: 'for i in {1..3}; do echo "$i"; sleep 1; done',
          *     shell: "bash",
          *     terminal: "name",

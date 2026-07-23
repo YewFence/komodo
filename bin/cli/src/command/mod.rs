@@ -161,7 +161,7 @@ fn matches_wildcards(
   })
 }
 
-fn format_timetamp(ts: i64) -> anyhow::Result<String> {
+fn format_timestamp(ts: i64) -> anyhow::Result<String> {
   let ts = chrono::Local
     .timestamp_millis_opt(ts)
     .single()

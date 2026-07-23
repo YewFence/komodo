@@ -144,7 +144,7 @@ export default function StackUpdateAvailable({
               })
             }
             loading={pending}
-            topAdditonal={
+            topAdditional={
               !fullStack?.config?.auto_update_all_services && (
                 <Stack className="bordered-light" p="md" bdrs="md" gap="sm">
                   <Text size="lg">
@@ -183,7 +183,7 @@ function Services({
             <Text c="dimmed">{s.service}</Text>
             <Text c="dimmed"> - </Text>
             <Text>
-              {latestServices?.find((ser) => ser.service_name == s.service)
+              {latestServices?.find((set) => set.service_name == s.service)
                 ?.image ?? s.image}
             </Text>
           </Group>

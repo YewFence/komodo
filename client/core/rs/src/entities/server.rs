@@ -217,37 +217,37 @@ pub struct ServerConfig {
   #[partial_default(default_send_alerts())]
   pub send_version_mismatch_alerts: bool,
 
-  /// The percentage threshhold which triggers WARNING state for CPU.
+  /// The percentage threshold which triggers WARNING state for CPU.
   #[serde(default = "default_cpu_warning")]
   #[builder(default = "default_cpu_warning()")]
   #[partial_default(default_cpu_warning())]
   pub cpu_warning: f32,
 
-  /// The percentage threshhold which triggers CRITICAL state for CPU.
+  /// The percentage threshold which triggers CRITICAL state for CPU.
   #[serde(default = "default_cpu_critical")]
   #[builder(default = "default_cpu_critical()")]
   #[partial_default(default_cpu_critical())]
   pub cpu_critical: f32,
 
-  /// The percentage threshhold which triggers WARNING state for MEM.
+  /// The percentage threshold which triggers WARNING state for MEM.
   #[serde(default = "default_mem_warning")]
   #[builder(default = "default_mem_warning()")]
   #[partial_default(default_mem_warning())]
   pub mem_warning: f64,
 
-  /// The percentage threshhold which triggers CRITICAL state for MEM.
+  /// The percentage threshold which triggers CRITICAL state for MEM.
   #[serde(default = "default_mem_critical")]
   #[builder(default = "default_mem_critical()")]
   #[partial_default(default_mem_critical())]
   pub mem_critical: f64,
 
-  /// The percentage threshhold which triggers WARNING state for DISK.
+  /// The percentage threshold which triggers WARNING state for DISK.
   #[serde(default = "default_disk_warning")]
   #[builder(default = "default_disk_warning()")]
   #[partial_default(default_disk_warning())]
   pub disk_warning: f64,
 
-  /// The percentage threshhold which triggers CRITICAL state for DISK.
+  /// The percentage threshold which triggers CRITICAL state for DISK.
   #[serde(default = "default_disk_critical")]
   #[builder(default = "default_disk_critical()")]
   #[partial_default(default_disk_critical())]

@@ -297,7 +297,7 @@ fn cron_parser() -> &'static CronParser {
   })
 }
 
-/// Finds the next run occurence in UTC ms.
+/// Finds the next run occurrence in UTC ms.
 fn find_next_occurrence(
   schedule: impl HasSchedule,
 ) -> anyhow::Result<i64> {

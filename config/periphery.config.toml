@@ -2,7 +2,7 @@
 # 🦎 KOMODO PERIPHERY CONFIG 🦎 #
 ################################
 
-## This is the offical "Default" config file for Komodo Periphery.
+## This is the official "Default" config file for Komodo Periphery.
 ## It serves as documentation for the meaning of the fields.
 ## It is located at `https://github.com/moghtech/komodo/blob/main/config/periphery.config.toml`.
 
@@ -149,7 +149,7 @@ exclude_disk_mounts = []
 ## Make Onboarding Keys in Server settings.
 ## Not needed if connecting as Server that already exists.
 ## Env: PERIPHERY_ONBOARDING_KEY
-# onboarding_key = "MC4CAQAwBQYDK2VuBCIEIHPHNA/0M9ejFviE2y4dpyczAvnAwPWDQtGGGhEJ2G6K"
+# onboarding_key = "<YOUR_ONBOARDING_KEY>"
 
 ################
 # INBOUND MODE #

@@ -73,7 +73,7 @@ Commands:
   pause-deployment        Pauses the container for the target deployment. Response: [Update]
   unpause-deployment      Unpauses the container for the target deployment. Response: [Update]
   stop-deployment         Stops the container for the target deployment. Response: [Update]
-  destroy-deployment      Stops and destroys the container for the target deployment. Reponse: [Update]
+  destroy-deployment      Stops and destroys the container for the target deployment. Response: [Update]
   clone-repo              Clones the target repo. Response: [Update]
   pull-repo               Pulls the target repo. Response: [Update]
   build-repo              Builds the target repo, using the attached builder. Response: [Update]
@@ -83,7 +83,7 @@ Commands:
   pause-container         Pauses the container on the target server. Response: [Update]
   unpause-container       Unpauses the container on the target server. Response: [Update]
   stop-container          Stops the container on the target server. Response: [Update]
-  destroy-container       Stops and destroys the container on the target server. Reponse: [Update]
+  destroy-container       Stops and destroys the container on the target server. Response: [Update]
   start-all-containers    Starts all containers on the target server. Response: [Update]
   restart-all-containers  Restarts all containers on the target server. Response: [Update]
   pause-all-containers    Pauses all containers on the target server. Response: [Update]
@@ -104,7 +104,7 @@ Commands:
   pause-stack             Pauses the target stack. `docker compose pause`. Response: [Update]
   unpause-stack           Unpauses the target stack. `docker compose unpause`. Response: [Update]
   stop-stack              Starts the target stack. `docker compose stop`. Response: [Update]
-  destroy-stack           Destoys the target stack. `docker compose down`. Response: [Update]
+  destroy-stack           Destroys the target stack. `docker compose down`. Response: [Update]
   sleep                   
   help                    Print this message or the help of the given subcommand(s)
 
@@ -115,4 +115,3 @@ Options:
 ### --yes
 
 You can use `--yes` to avoid any human prompt to continue, for use in automated environments.
-

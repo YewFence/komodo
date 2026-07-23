@@ -1,0 +1,20 @@
+# Historical onboarding-key examples. The current example uses an obvious
+# placeholder, while these exact findings remain in published Git history.
+08e55b51808b7c9ad0033bbf44e169b3a77335a2:config/periphery.config.toml:generic-api-key:151
+5fd256444e2f58baae69ce45bf5cbcb7f019eb8b:config/periphery.config.toml:generic-api-key:138
+
+# Confirmed example and placeholder values in historical commits.
+0d462fb2e053f8ae4741f1c21ac3935253e44408:ui/public/schema/resources.json:slack-webhook-url:5215
+08e55b51808b7c9ad0033bbf44e169b3a77335a2:ui/src/resources/alerter/config/endpoint.tsx:slack-webhook-url:77
+96c4ae9fc525de796894a099e6a6ed6e17f99c7a:ui/src/resources/alerter/config/endpoint.tsx:slack-webhook-url:78
+31034e5b343cad431ff6724b7fe53ae00f5aa80d:frontend/src/components/resources/alerter/config/endpoint.tsx:slack-webhook-url:91
+3c5868d111ce1424173c33eef478503acfc3a127:frontend/src/components/resources/alerter/config/endpoint.tsx:slack-webhook-url:56
+3f8e75bbd85051992f0418c700d829db814c83ce:client/core/rs/src/entities/alerter.rs:slack-webhook-url:271
+050571196c1c9a5b2969a6bc3b2c143ecb4ba404:client/core/rs/src/entities/alerter.rs:slack-webhook-url:134
+60205ece9dbc4d044081a21ea33a7e7c4a506ce1:lib/types/src/entities/alerter.rs:slack-webhook-url:130
+54df0af48ec0cd71b6322ac3f98914932a0332ba:lib/types/src/entities/alerter.rs:slack-webhook-url:141
+41d1ff97606be814ff51d45935df412992da25ef:client/core/rs/src/api/mod.rs:curl-auth-header:37
+7d4376f4266f34d9f536bea749ec9d3943edc458:test.core.config.toml:mongodb-connection-string:15
+12abd5a5bdf9fe69d9e41325f83d6446ce1d551b:test.core.config.toml:mongodb-connection-string:10
+144344bcfc8f71cd48763bc2d0f5b882cb68fcd4:config_example/core.env.example:mongodb-connection-string:38
+ae6736cae53f260473c9f3d9486b3b5ca9d02531:periphery/src/config.ts:generic-api-key:5

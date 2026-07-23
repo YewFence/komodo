@@ -1,4 +1,4 @@
-//! Implementes both sides of Noise handshake
+//! Implements both sides of Noise handshake
 //! using asymmetric private-public key authentication.
 
 use std::time::Duration;
@@ -196,7 +196,7 @@ impl LoginFlow for ClientLoginFlow {
         .await
         .context("[Client] Failed to send handshake_m3")?;
 
-      // Receive login sucessful
+      // Receive login successful
       socket.recv_login_success().await.context(
         "[Client] Failed to receive Login Success message",
       )?;

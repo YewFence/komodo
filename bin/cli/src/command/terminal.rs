@@ -189,7 +189,7 @@ async fn handle_terminal_forwarding<
   )
   .context("failed to register SIGWINCH handler")?;
 
-  // Send first resize messsage, bailing if it fails to get the size.
+  // Send first resize message, bailing if it fails to get the size.
   write_tx.send(resize_message()?).await?;
 
   let cancel = CancellationToken::new();

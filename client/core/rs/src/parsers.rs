@@ -141,7 +141,7 @@ pub fn parse_multiline_command(command: impl AsRef<str>) -> String {
     .join(" && ")
 }
 
-/// Parses a list of strings from a comment seperated and multiline string
+/// Parses a list of strings from a comment separated and multiline string
 ///
 /// Example source:
 /// ```text
@@ -149,7 +149,7 @@ pub fn parse_multiline_command(command: impl AsRef<str>) -> String {
 /// path/to/file1 # comment1
 /// path/to/file2
 ///
-/// # also supports comma seperated values
+/// # also supports comma separated values
 /// path/to/file3,path/to/file4
 /// ```
 ///

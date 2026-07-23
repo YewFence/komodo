@@ -42,7 +42,7 @@ use serde::Serialize;
 
 use crate::{
   command::{
-    PrintTable, format_timetamp, matches_wildcards, parse_wildcards,
+    PrintTable, format_timestamp, matches_wildcards, parse_wildcards,
     print_items,
   },
   config::cli_config,
@@ -999,7 +999,7 @@ impl PrintTable for ResourceListItem<ProcedureListItemInfo> {
     };
     let next_run = if let Some(ts) = self.info.next_scheduled_run {
       Cell::new(
-        format_timetamp(ts)
+        format_timestamp(ts)
           .unwrap_or(String::from("Invalid next ts")),
       )
       .add_attribute(Attribute::Bold)
@@ -1042,7 +1042,7 @@ impl PrintTable for ResourceListItem<ActionListItemInfo> {
     };
     let next_run = if let Some(ts) = self.info.next_scheduled_run {
       Cell::new(
-        format_timetamp(ts)
+        format_timestamp(ts)
           .unwrap_or(String::from("Invalid next ts")),
       )
       .add_attribute(Attribute::Bold)
@@ -1173,7 +1173,7 @@ impl PrintTable for Terminal {
         format!("{:.} KiB", self.stored_size_kb)
       }),
       Cell::new(
-        format_timetamp(self.created_at)
+        format_timestamp(self.created_at)
           .unwrap_or_else(|_| String::from("Invalid created at")),
       ),
     ]
@@ -1191,7 +1191,7 @@ impl PrintTable for Schedule {
   fn row(self, links: bool) -> Vec<comfy_table::Cell> {
     let next_run = if let Some(ts) = self.next_scheduled_run {
       Cell::new(
-        format_timetamp(ts)
+        format_timestamp(ts)
           .unwrap_or_else(|_| String::from("Invalid next ts")),
       )
       .add_attribute(Attribute::Bold)

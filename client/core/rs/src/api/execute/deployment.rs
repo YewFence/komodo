@@ -295,7 +295,7 @@ pub fn destroy_deployment() {}
 //
 
 /// Stops and destroys the container for the target deployment.
-/// Reponse: [Update].
+/// Response: [Update].
 ///
 /// 1. The container is stopped and removed using `docker container rm ${container_name}`.
 #[typeshare]

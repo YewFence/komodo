@@ -59,7 +59,7 @@ pub struct ContainerListItem {
   /// The volume names attached to container
   #[serde(default, skip_serializing_if = "Vec::is_empty")]
   pub volumes: Vec<String>,
-  /// The container stats, if they can be retreived.
+  /// The container stats, if they can be retrieved.
   #[serde(skip_serializing_if = "Option::is_none")]
   pub stats: Option<ContainerStats>,
   /// The labels attached to container.

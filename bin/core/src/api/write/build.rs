@@ -568,7 +568,7 @@ async fn get_git_remote(
   .context("Failed to clone Build repo")?;
 
   // Ensure clone / pull successful,
-  // propogate error log -> 'errored' and return.
+  // propagate error log -> 'errored' and return.
   if let Some(failure) = res.logs.iter().find(|log| !log.success) {
     return Ok(Some(RemoteDockerfileContents {
       path: Some(format!("Failed at: {}", failure.stage)),

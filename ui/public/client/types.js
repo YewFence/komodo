@@ -747,7 +747,7 @@ export var StackState;
     StackState["Running"] = "running";
     /** All containers are paused */
     StackState["Paused"] = "paused";
-    /** All contianers are stopped */
+    /** All containers are stopped */
     StackState["Stopped"] = "stopped";
     /** All containers are created */
     StackState["Created"] = "created";

@@ -240,7 +240,7 @@
           "minimum": 0
         },
         "timezone": {
-          "description": "Timezone for maintenance window specificiation.\nIf empty, will use Core timezone.",
+          "description": "Timezone for maintenance window specification.\nIf empty, will use Core timezone.",
           "type": "string",
           "default": ""
         },
@@ -443,7 +443,7 @@
           ]
         },
         "cpu_warning": {
-          "description": "The percentage threshhold which triggers WARNING state for CPU.",
+          "description": "The percentage threshold which triggers WARNING state for CPU.",
           "type": [
             "number",
             "null"
@@ -451,7 +451,7 @@
           "format": "float"
         },
         "cpu_critical": {
-          "description": "The percentage threshhold which triggers CRITICAL state for CPU.",
+          "description": "The percentage threshold which triggers CRITICAL state for CPU.",
           "type": [
             "number",
             "null"
@@ -459,7 +459,7 @@
           "format": "float"
         },
         "mem_warning": {
-          "description": "The percentage threshhold which triggers WARNING state for MEM.",
+          "description": "The percentage threshold which triggers WARNING state for MEM.",
           "type": [
             "number",
             "null"
@@ -467,7 +467,7 @@
           "format": "double"
         },
         "mem_critical": {
-          "description": "The percentage threshhold which triggers CRITICAL state for MEM.",
+          "description": "The percentage threshold which triggers CRITICAL state for MEM.",
           "type": [
             "number",
             "null"
@@ -475,7 +475,7 @@
           "format": "double"
         },
         "disk_warning": {
-          "description": "The percentage threshhold which triggers WARNING state for DISK.",
+          "description": "The percentage threshold which triggers WARNING state for DISK.",
           "type": [
             "number",
             "null"
@@ -483,7 +483,7 @@
           "format": "double"
         },
         "disk_critical": {
-          "description": "The percentage threshhold which triggers CRITICAL state for DISK.",
+          "description": "The percentage threshold which triggers CRITICAL state for DISK.",
           "type": [
             "number",
             "null"
@@ -1937,7 +1937,7 @@
       ]
     },
     "Execution": {
-      "description": "A wrapper for all Komodo exections.",
+      "description": "A wrapper for all Komodo executions.",
       "oneOf": [
         {
           "description": "The \"null\" execution. Does nothing.",
@@ -3458,7 +3458,7 @@
       ]
     },
     "DestroyStack": {
-      "description": "Destoys the target stack. `docker compose down`. Response: [Update]",
+      "description": "Destroys the target stack. `docker compose down`. Response: [Update]",
       "type": "object",
       "properties": {
         "stack": {
@@ -3786,7 +3786,7 @@
       ]
     },
     "RunBuild": {
-      "description": "Runs the target build. Response: [Update].\n\n1. Get a handle to the builder. If using AWS builder, this means starting a builder ec2 instance.\n\n2. Clone the repo on the builder. If an `on_clone` commmand is given, it will be executed.\n\n3. Execute `docker build {...params}`, where params are determined using the builds configuration.\n\n4. If a docker registry is configured, the build will be pushed to the registry.\n\n5. If using AWS builder, destroy the builder ec2 instance.\n\n6. Deploy any Deployments with *Redeploy on Build* enabled.",
+      "description": "Runs the target build. Response: [Update].\n\n1. Get a handle to the builder. If using AWS builder, this means starting a builder ec2 instance.\n\n2. Clone the repo on the builder. If an `on_clone` command is given, it will be executed.\n\n3. Execute `docker build {...params}`, where params are determined using the builds configuration.\n\n4. If a docker registry is configured, the build will be pushed to the registry.\n\n5. If using AWS builder, destroy the builder ec2 instance.\n\n6. Deploy any Deployments with *Redeploy on Build* enabled.",
       "type": "object",
       "properties": {
         "build": {

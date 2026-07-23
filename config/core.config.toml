@@ -2,7 +2,7 @@
 # 🦎 KOMODO CORE CONFIG 🦎 #
 ###########################
 
-## This is the offical "Default" config file for Komodo Core.
+## This is the official "Default" config file for Komodo Core.
 ## It serves as documentation for the meaning of the fields.
 ## It is located at `https://github.com/moghtech/komodo/blob/main/config/core.config.toml`.
 
@@ -80,7 +80,7 @@ private_key = "file:/config/keys/core.key"
 # first_server_address = ""
 
 ## Disables write support on resources in the UI.
-## This protects users that that would normally have write priviledges during their UI usage,
+## This protects users that that would normally have write privileges during their UI usage,
 ## when they intend to fully rely on ResourceSyncs to manage config.
 ## Env: KOMODO_UI_WRITE_DISABLED
 ## Default: false
@@ -262,7 +262,7 @@ oidc_client_id = ""
 
 ## Set the OIDC Client Secret.
 ## If the OIDC provider supports PKCE-only flow,
-## the client secret is not necessary and can be ommitted or left empty.
+## the client secret is not necessary and can be omitted or left empty.
 ## Env: KOMODO_OIDC_CLIENT_SECRET or KOMODO_OIDC_CLIENT_SECRET_FILE
 oidc_client_secret = ""
 
@@ -485,7 +485,7 @@ database.app_name = "komodo_core"
 ## Optional, no default.
 webhook_secret = "a_random_webhook_secret"
 
-## An alternate base url that is used to recieve git webhook requests.
+## An alternate base url that is used to receive git webhook requests.
 ## If empty or not specified, will use 'host' address as base.
 ## This is useful if Komodo is on an internal network, but can have a
 ## proxy just allowing through the webhook listener api using NGINX.

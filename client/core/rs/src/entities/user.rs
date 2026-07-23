@@ -44,7 +44,7 @@ pub struct User {
   #[serde(default)]
   pub enabled: bool,
 
-  /// Can give / take other users admin priviledges.
+  /// Can give / take other users admin privileges.
   #[serde(default)]
   pub super_admin: bool,
 

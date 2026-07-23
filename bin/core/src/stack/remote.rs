@@ -35,7 +35,7 @@ pub async fn get_repo_compose_contents(
       .context("Failed to clone stack repo")?;
 
   // Ensure clone / pull successful,
-  // propogate error log -> 'errored' and return.
+  // propagate error log -> 'errored' and return.
   if let Some(failure) = logs.iter().find(|log| !log.success) {
     return Ok(RemoteComposeContents {
       errored: vec![FileContents {

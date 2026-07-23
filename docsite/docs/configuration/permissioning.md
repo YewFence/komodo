@@ -36,7 +36,7 @@ Some features are additionally gated behind a specific permission for that featu
   - **On Servers**: Access to this api will expose all container environments on the given server,
   and can easily lead to secrets being leaked to unintended users if not protected.
 - **`Terminal`**: User can access the associated resource's terminal.
-  - If given on a `Server`, this allows server level terminal access, and all container exec priviledges (Including attached `Stacks` / `Deployments`).
+  - If given on a `Server`, this allows server level terminal access, and all container exec privileges (Including attached `Stacks` / `Deployments`).
   - If given on a `Stack` or `Deployment`, this allows container exec terminal (even without `Terminal` on `Server`).
 - **`Attach`**: User can "attach" *other resources* to the resource.
   - If given on a `Server`, allows users to attach `Stacks`, `Deployments`, `Repos`, and `Builders`.

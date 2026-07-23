@@ -409,7 +409,7 @@ pub struct StopStack {
 )]
 pub fn destroy_stack() {}
 
-/// Destoys the target stack. `docker compose down`. Response: [Update]
+/// Destroys the target stack. `docker compose down`. Response: [Update]
 #[typeshare]
 #[derive(
   Debug, Clone, PartialEq, Serialize, Deserialize, Resolve, Parser,

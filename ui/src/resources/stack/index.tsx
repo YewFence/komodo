@@ -219,7 +219,7 @@ export const StackComponents: RequiredResourceComponents<
       );
     },
 
-    UpdateAvalable: StackUpdateAvailable,
+    UpdateAvailable: StackUpdateAvailable,
     Hash: ({ id }) => {
       const fullInfo = useFullStack(id)?.info;
       const info = useStack(id)?.info;

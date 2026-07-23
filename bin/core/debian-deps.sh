@@ -11,4 +11,3 @@ rm -rf /var/lib/apt/lists/*
 curl -sS https://starship.rs/install.sh | sh -s -- --yes --bin-dir /usr/local/bin
 echo 'export STARSHIP_CONFIG=/starship.toml' >> /root/.bashrc
 echo 'eval "$(starship init bash)"' >> /root/.bashrc
-

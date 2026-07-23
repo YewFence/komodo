@@ -15,7 +15,7 @@ pub struct Build {
   /// maps (domain, account) -> token.
   #[serde(default)]
   pub registry_tokens: Vec<(String, String, String)>,
-  /// Propogate any secret replacers from core interpolation.
+  /// Propagate any secret replacers from core interpolation.
   #[serde(default)]
   pub replacers: Vec<(String, String)>,
   /// Pass the commit hash to use with tagging

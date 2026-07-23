@@ -153,7 +153,7 @@ impl Resolve<ExecuteArgs> for RunAction {
     )
     .await?;
 
-    // Do next steps in seperate error handling block,
+    // Do next steps in separate error handling block,
     // and delete the API key before unwrapping the error.
     // If Komodo shuts down during these steps, there will
     // be a dangling api key in the DB with user_id: "000000000000000000000002".

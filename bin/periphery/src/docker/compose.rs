@@ -63,7 +63,7 @@ pub struct DockerComposeLsItem {
   pub name: String,
   #[serde(alias = "Status")]
   pub status: Option<String>,
-  /// Comma seperated list of paths
+  /// Comma separated list of paths
   #[serde(default, alias = "ConfigFiles")]
   pub config_files: String,
 }

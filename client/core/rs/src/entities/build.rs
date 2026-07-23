@@ -298,7 +298,7 @@ pub struct BuildConfig {
   ///
   /// Can be used in conjunction with `image_tag` to direct multiple builds
   /// with different configs to push to the same image registry, under different,
-  /// independantly versioned tags.
+  /// independently versioned tags.
   #[serde(default)]
   #[builder(default)]
   pub image_name: String,
@@ -309,7 +309,7 @@ pub struct BuildConfig {
   ///
   /// Can be used in conjunction with `image_name` to direct multiple builds
   /// with different configs to push to the same image registry, under different,
-  /// independantly versioned tags.
+  /// independently versioned tags.
   #[serde(default)]
   #[builder(default)]
   pub image_tag: String,

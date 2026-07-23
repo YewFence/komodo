@@ -5,7 +5,7 @@
 //!
 //! The recommended method for running Komodo Core is via the docker image. This image has a default
 //! configuration file provided in the image, meaning any custom configuration can be provided
-//! on the environment alone. However, if a custom configuration file is prefered, it can be mounted
+//! on the environment alone. However, if a custom configuration file is preferred, it can be mounted
 //! into the image at `/config/config.toml`.
 //!
 
@@ -372,7 +372,7 @@ pub struct CoreConfig {
   /// If not provided, Periphery -> Core connected Servers must
   /// configure accepted public key individually.
   ///
-  /// Supports multiple public keys seperated by commas or newlines.
+  /// Supports multiple public keys separated by commas or newlines.
   ///
   /// Supports openssl generated pem file, `openssl pkey -in private.key -pubout -out public.key`.
   /// To load from file, include `file:/path/to/public.key` in the list.
@@ -450,12 +450,12 @@ pub struct CoreConfig {
   #[serde(default = "default_min_password_length")]
   pub min_password_length: u16,
 
-  /// Upon fresh launch, initalize an Admin user with this username.
+  /// Upon fresh launch, initialize an Admin user with this username.
   /// If this is not provided, no initial user will be created.
   #[serde(skip_serializing_if = "Option::is_none")]
   pub init_admin_username: Option<String>,
 
-  /// Upon fresh launch, initalize an Admin user with this password.
+  /// Upon fresh launch, initialize an Admin user with this password.
   /// Default: `changeme`
   #[serde(default = "default_init_admin_password")]
   pub init_admin_password: String,
@@ -519,7 +519,7 @@ pub struct CoreConfig {
   pub oidc_enabled: bool,
 
   /// Configure OIDC provider address for
-  /// communcation directly with Komodo Core.
+  /// communication directly with Komodo Core.
   ///
   /// Note. Needs to be reachable from Komodo Core.
   ///
