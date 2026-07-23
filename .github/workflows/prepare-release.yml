@@ -36,7 +36,7 @@ jobs:
         uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          install_args: git-cliff
+          install_args: git-cliff cargo:cargo-edit
           add_shims_to_path: true
           cache_key: "mise-prepare-release-{{install_args_hash}}-{{file_hash}}"
 
@@ -91,16 +91,22 @@ jobs:
           RELEASE_TAG: ${{ steps.release.outputs.tag }}
         run: mise run release:changelog
 
+      - name: Update Cargo workspace version
+        if: ${{ steps.release.outputs.should_prepare == 'true' }}
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+        run: mise run release:version:set
+
       - name: Push release branch
         id: branch
         if: ${{ steps.release.outputs.should_prepare == 'true' }}
         env:
           RELEASE_TAG: ${{ steps.release.outputs.tag }}
         run: |
-          if [[ -z "$(git status --porcelain -- CHANGELOG.md)" ]]; then
-            echo "CHANGELOG.md is already up to date"
+          if [[ -z "$(git status --porcelain -- CHANGELOG.md Cargo.toml Cargo.lock ':(glob)**/Cargo.toml')" ]]; then
+            echo "Release files are already up to date"
             {
-              echo "| Changelog changed | \`false\` |"
+              echo "| Release files changed | \`false\` |"
               echo "| Release branch pushed | \`false\` |"
               echo "| Release PR action | \`skipped\` |"
             } >> "${GITHUB_STEP_SUMMARY}"
@@ -112,11 +118,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git switch -c "${RELEASE_BRANCH}"
-          git add CHANGELOG.md
+          git add -- CHANGELOG.md Cargo.toml Cargo.lock ':(glob)**/Cargo.toml'
           git commit -m "chore: release ${RELEASE_TAG}"
           git push --force origin "HEAD:${RELEASE_BRANCH}"
           {
-            echo "| Changelog changed | \`true\` |"
+            echo "| Release files changed | \`true\` |"
             echo "| Release branch pushed | \`true\` |"
           } >> "${GITHUB_STEP_SUMMARY}"
           echo "changed=true" >> "${GITHUB_OUTPUT}"

@@ -19,6 +19,7 @@ typos = "1.48.0"
 betterleaks = "1"
 actionlint = "1"
 yarn = "1.22.22"
+"cargo:cargo-edit" = "latest"
 
 [vars]
 nllint_excludes = "':(top,exclude)LICENSE'"

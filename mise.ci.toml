@@ -25,6 +25,14 @@ fi
 printf '%s\\n' "${version}"
 """
 
+[tasks.'release:version:set']
+description = "Set the Cargo workspace version for RELEASE_TAG, or for the next release tag"
+shell = "bash -c"
+run = """
+tag="$(mise run release:tag)"
+cargo set-version --workspace "${tag#v}"
+"""
+
 [tasks.'release:tag']
 description = "Print the release tag, automatically generate if RELEASE_TAG is not set"
 shell = "bash -c"

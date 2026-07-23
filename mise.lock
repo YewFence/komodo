@@ -132,6 +132,10 @@ provenance = "cosign"
 version = "0.22.2"
 backend = "cargo:cargo-audit"
 
+[[tools."cargo:cargo-edit"]]
+version = "0.13.13"
+backend = "cargo:cargo-edit"
+
 [[tools."github:suzuki-shunsuke/nllint"]]
 version = "1.1.0"
 backend = "github:suzuki-shunsuke/nllint"
