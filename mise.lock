@@ -366,3 +366,37 @@ url_api = "https://api.github.com/repos/crate-ci/typos/releases/assets/462430871
 checksum = "sha256:ce018a2352da7c1b23bd2684019ee279d2080dc063087020e80c1247d11b0743"
 url = "https://github.com/crate-ci/typos/releases/download/v1.48.0/typos-v1.48.0-x86_64-pc-windows-msvc.zip"
 url_api = "https://api.github.com/repos/crate-ci/typos/releases/assets/462430871"
+
+[[tools.yarn]]
+version = "1.22.22"
+backend = "vfox:mise-plugins/vfox-yarn"
+
+[tools.yarn."platforms.linux-arm64"]
+url = "https://classic.yarnpkg.com/downloads/1.22.22/yarn-v1.22.22.tar.gz"
+
+[tools.yarn."platforms.linux-arm64-musl"]
+url = "https://classic.yarnpkg.com/downloads/1.22.22/yarn-v1.22.22.tar.gz"
+
+[tools.yarn."platforms.linux-x64"]
+url = "https://classic.yarnpkg.com/downloads/1.22.22/yarn-v1.22.22.tar.gz"
+
+[tools.yarn."platforms.linux-x64-baseline"]
+url = "https://classic.yarnpkg.com/downloads/1.22.22/yarn-v1.22.22.tar.gz"
+
+[tools.yarn."platforms.linux-x64-musl"]
+url = "https://classic.yarnpkg.com/downloads/1.22.22/yarn-v1.22.22.tar.gz"
+
+[tools.yarn."platforms.linux-x64-musl-baseline"]
+url = "https://classic.yarnpkg.com/downloads/1.22.22/yarn-v1.22.22.tar.gz"
+
+[tools.yarn."platforms.macos-arm64"]
+url = "https://classic.yarnpkg.com/downloads/1.22.22/yarn-v1.22.22.tar.gz"
+
+[tools.yarn."platforms.macos-x64"]
+url = "https://classic.yarnpkg.com/downloads/1.22.22/yarn-v1.22.22.tar.gz"
+
+[tools.yarn."platforms.windows-x64"]
+url = "https://classic.yarnpkg.com/downloads/1.22.22/yarn-v1.22.22.tar.gz"
+
+[tools.yarn."platforms.windows-x64-baseline"]
+url = "https://classic.yarnpkg.com/downloads/1.22.22/yarn-v1.22.22.tar.gz"

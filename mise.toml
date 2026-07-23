@@ -18,6 +18,7 @@ pinact = "4"
 typos = "1.48.0"
 betterleaks = "1"
 actionlint = "1"
+yarn = "1.22.22"
 
 [vars]
 nllint_excludes = "':(top,exclude)LICENSE'"
@@ -65,6 +66,29 @@ run = "cargo build --workspace --release --locked"
 description = "Check every Rust workspace target"
 run = "cargo check --workspace --all-targets --locked"
 
+[tasks."frontend:client:build"]
+description = "Install dependencies and build the TypeScript client"
+dir = "client/core/ts"
+run = [
+  "yarn install --frozen-lockfile",
+  "yarn build",
+  "yarn link --link-folder ../../../target/yarn-links"
+]
+
+[tasks."frontend:ui:build"]
+description = "Install dependencies, link the client, and build the UI"
+depends = ["frontend:client:build"]
+dir = "ui"
+run = [
+  "yarn link komodo_client --link-folder ../target/yarn-links",
+  "yarn install --frozen-lockfile",
+  "yarn build"
+]
+
+[tasks."frontend:build"]
+description = "Build the TypeScript client and UI"
+depends = ["frontend:ui:build"]
+
 [tasks.audit]
 description = "Audit Cargo dependencies for known vulnerabilities"
 run = "cargo audit"
@@ -92,7 +116,7 @@ run = "git grep -Ilz '' -- . {{ vars.nllint_excludes }} | xargs -0 nllint --fix 
 [tasks.check]
 description = "Run read-only project and repository checks"
 run = [
-  { tasks = [ "deps:check", "newline:check", "typos:check", "fmt:check", "build:check" ] },
+  { tasks = [ "deps:check", "newline:check", "typos:check", "fmt:check", "build:check", "frontend:build" ] },
   { task = "leaks:check" },
   { task = "actions:check" },
   { task = "lint" },
