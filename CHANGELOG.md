@@ -2,6 +2,13 @@
 
 YewFence fork release notes.
 
+## What's Changed in 0.2.0
+* chore: release v0.2.0 by @YewFence
+* ci(release): bump Cargo workspace version during release preparation by @YewFence
+* feat(frontend): add build tasks and wrap ConfirmModal to fix prop typo by @YewFence
+
+**Full Changelog**: https://github.com/YewFence/komodo/compare/v0.1.0...v0.2.0
+
 ## What's Changed in 0.1.0
 * chore: fix lint by @YewFence
 * chore: delete useless upstream files by @YewFence
