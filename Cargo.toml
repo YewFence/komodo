@@ -9,12 +9,12 @@ members = [
 ]
 
 [workspace.package]
-version = "2.2.0"
+version = "0.2.0"
 edition = "2024"
-authors = ["mbecker20 <becker.maxh@gmail.com>"]
+authors = ["mbecker20 <becker.maxh@gmail.com>","YewFence <hello@yewfence.dev>"]
 license = "GPL-3.0-or-later"
-repository = "https://github.com/moghtech/komodo"
-homepage = "https://komo.do"
+repository = "https://github.com/YewFence/komodo"
+homepage = "https://github.com/YewFence/komodo"
 
 [workspace.dependencies]
 # LOCAL
