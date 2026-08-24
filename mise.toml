@@ -1,2 +1,57 @@
 [tools]
 aube = "latest"
+rust = { version = "latest", components = ["rustfmt"] }
+node = "22"
+
+[tasks."js-install"]
+alias = "yi"
+description = "installs ui and ts client dependencies via aube"
+run = "aube install"
+
+[tasks."build-client"]
+alias = "bc"
+description = "builds the ts client and refreshes ui/public/client"
+run = """
+cd ./client/core/ts && aube build && \
+cp -r dist/. ../../../ui/public/client/. && \
+cd ../../../ui && node fix_public_client.mjs
+"""
+
+[tasks."gen-client"]
+alias = "gc"
+description = "regenerates TS types from Rust (requires typeshare-cli on PATH), then rebuilds the client"
+run = "node ./client/core/ts/generate_types.mjs"
+depends_post = ["build-client"]
+
+[tasks."dev-ui"]
+alias = "du"
+description = "starts the ui dev server"
+run = "cd ui && aube dev"
+
+[tasks."build-ui"]
+alias = "bu"
+description = "builds the ts client and the ui"
+depends = ["build-client"]
+run = "cd ui && aube build"
+
+[tasks."preview-ui"]
+alias = "pu"
+description = "runs the ui preview server on :5173"
+run = "cd ui && aube preview"
+
+[tasks."dev-core"]
+alias = "dc"
+description = "runs core --release pointing to .dev/core.config.toml"
+run = "KOMODO_CONFIG_PATH=.dev/core.config.toml cargo run -p komodo_core --release"
+
+[tasks."dev-periphery"]
+alias = "dp"
+description = "runs periphery --release pointing to .dev/periphery.config.toml"
+run = "cargo run -p komodo_periphery --release -- -c .dev/periphery.config.toml"
+
+[tasks."dev-compose"]
+description = "starts the dev database stack"
+run = """
+docker compose -p komodo-dev -f dev.compose.yaml down --remove-orphans && \
+docker compose -p komodo-dev -f dev.compose.yaml up -d
+"""
