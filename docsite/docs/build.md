@@ -178,6 +178,3 @@ To create the AMI:
 
 The instance `user_data` will install the Periphery agent as the instance starts up,
 and Komodo Core will then connect and build the image.
-
-
-

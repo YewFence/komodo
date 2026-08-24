@@ -30,7 +30,7 @@ pub fn create_variable() {}
 pub struct CreateVariable {
   /// The name of the variable to create.
   pub name: String,
-  /// The initial value of the variable. defualt: "".
+  /// The initial value of the variable. default: "".
   #[serde(default)]
   pub value: String,
   /// The initial value of the description. default: "".

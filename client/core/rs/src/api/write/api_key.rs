@@ -34,7 +34,7 @@ pub struct CreateApiKeyForServiceUser {
   pub user_id: String,
   /// The name for the api key
   pub name: String,
-  /// A unix timestamp in millseconds specifying api key expire time.
+  /// A unix timestamp in milliseconds specifying api key expire time.
   /// Default is 0, which means no expiry.
   #[serde(default)]
   pub expires: I64,

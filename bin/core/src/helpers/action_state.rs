@@ -1,7 +1,7 @@
 //! # Action State Management
 //!
-//! This module provides thread-safe state management for resource exections.
-//! It prevents concurrent execution of exections on the same resource using
+//! This module provides thread-safe state management for resource executions.
+//! It prevents concurrent execution of executions on the same resource using
 //! a Mutex-based locking mechanism with RAII guards.
 //!
 //! ## Safety

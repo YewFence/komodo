@@ -1,6 +1,6 @@
 # Resources
 
-Komodo is extendible through the **Resource** abstraction. Entities like `Server`, `Deployment`, and `Stack` are all **Komodo Resources**.
+Komodo is extendable through the **Resource** abstraction. Entities like `Server`, `Deployment`, and `Stack` are all **Komodo Resources**.
 
 All resources have common traits, such as a unique `name` and `id` amongst all other resources of the same resource type.
 All resources can be assigned `tags`, which can be used to group related resources.

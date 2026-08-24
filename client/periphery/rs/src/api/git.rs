@@ -34,7 +34,7 @@ pub struct CloneRepo {
   pub on_pull: Option<SystemCommand>,
   #[serde(default)]
   pub skip_secret_interp: bool,
-  /// Propogate any secret replacers from core interpolation.
+  /// Propagate any secret replacers from core interpolation.
   #[serde(default)]
   pub replacers: Vec<(String, String)>,
 }
@@ -59,7 +59,7 @@ pub struct PullRepo {
   pub on_pull: Option<SystemCommand>,
   #[serde(default)]
   pub skip_secret_interp: bool,
-  /// Propogate any secret replacers from core interpolation.
+  /// Propagate any secret replacers from core interpolation.
   #[serde(default)]
   pub replacers: Vec<(String, String)>,
 }
@@ -82,7 +82,7 @@ pub struct PullOrCloneRepo {
   pub on_pull: Option<SystemCommand>,
   #[serde(default)]
   pub skip_secret_interp: bool,
-  /// Propogate any secret replacers from core interpolation.
+  /// Propagate any secret replacers from core interpolation.
   #[serde(default)]
   pub replacers: Vec<(String, String)>,
 }

@@ -25,7 +25,7 @@ pub fn run_build() {}
 ///
 /// 1. Get a handle to the builder. If using AWS builder, this means starting a builder ec2 instance.
 ///
-/// 2. Clone the repo on the builder. If an `on_clone` commmand is given, it will be executed.
+/// 2. Clone the repo on the builder. If an `on_clone` command is given, it will be executed.
 ///
 /// 3. Execute `docker build {...params}`, where params are determined using the builds configuration.
 ///
