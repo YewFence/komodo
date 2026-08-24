@@ -1,0 +1,5 @@
+# Fork-only: keep local docker build contexts small (git contexts in CI are already clean).
+target
+node_modules
+dist
+.git
