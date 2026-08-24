@@ -2,7 +2,7 @@ import { Group, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { CircleOff } from "lucide-react";
 import { usePermissions, useWrite } from "@/lib/hooks";
-import { ConfirmModal } from "mogh_ui";
+import { ConfirmModal } from "@/components/confirm-modal";
 import { useServer } from ".";
 
 export default function ConfirmServerPubkey({ id }: { id: string }) {
@@ -30,7 +30,7 @@ export default function ConfirmServerPubkey({ id }: { id: string }) {
       confirmText={server.name}
       icon={<CircleOff size="1rem" />}
       targetProps={{ color: "red" }}
-      topAdditonal={
+      topAdditional={
         <Group gap="xs">
           <Text c="dimmed">Public Key:</Text>
           {server.info.attempted_public_key}

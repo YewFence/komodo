@@ -129,7 +129,7 @@ export default function StackUpdateAvailable({
               })
             }
             loading={pending}
-            topAdditonal={
+            topAdditional={
               !info?.auto_update_all_services && (
                 <Stack className="bordered-light" p="md" bdrs="md" gap="sm">
                   <Text size="lg">
