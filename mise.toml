@@ -55,3 +55,16 @@ run = """
 docker compose -p komodo-dev -f dev.compose.yaml down --remove-orphans && \
 docker compose -p komodo-dev -f dev.compose.yaml up -d
 """
+
+[tasks."build-binaries"]
+description = "release-builds core, periphery and km into dist/ (Debian build deps: build-essential pkg-config libssl-dev)"
+run = """
+cargo build --release -p komodo_core -p komodo_periphery -p komodo_cli && \
+mkdir -p dist && \
+cp target/release/core target/release/periphery target/release/km dist/ && \
+strip dist/core dist/periphery dist/km
+"""
+
+[tasks."release-publish"]
+description = "creates or updates the rolling GitHub release and uploads dist/ assets (--dry-run prints the plan)"
+file = "scripts/release-publish.sh"
