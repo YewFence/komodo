@@ -65,6 +65,22 @@ cp target/release/core target/release/periphery target/release/km dist/ && \
 strip dist/core dist/periphery dist/km
 """
 
+[tasks."collect-release-assets"]
+description = "copies and strips core, periphery and km into dist/ named <bin>-<arch> like upstream release assets"
+usage = '''
+arg "<arch>" help="Architecture suffix in asset names" {
+  choices "x86_64" "aarch64"
+}
+'''
+run = """
+set -eu
+mkdir -p dist
+for bin in core periphery km; do
+  cp "target/release/$bin" "dist/$bin-${usage_arch}"
+  strip "dist/$bin-${usage_arch}"
+done
+"""
+
 [tasks."release-publish"]
 description = "creates or updates the rolling GitHub release and uploads dist/ assets (--dry-run prints the plan)"
 file = "scripts/release-publish.sh"
